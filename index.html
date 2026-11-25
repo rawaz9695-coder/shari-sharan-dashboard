@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shari Sharan Project Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --brand: #cf5c2a;
+      --brand-dark: #b34b1e;
+      --brand-soft: rgba(207, 92, 42, 0.1);
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --white: #ffffff;
+      --green: #10b981;
+      --green-dark: #059669;
+      --green-soft: rgba(16, 185, 129, 0.14);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+      --purple: #8b5cf6;
+      --purple-soft: rgba(139, 92, 246, 0.16);
+      --blue: #2563eb;
+      --blue-soft: rgba(37, 99, 235, 0.12);
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07);
+      --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.11);
+      --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.28);
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --font-ku: "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+      background: var(--slate-100);
+      color: var(--slate-900);
+      overflow: hidden;
+    }
+
+    .app-shell { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
+    /* ---------- Header ---------- */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 20px;
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      z-index: 50;
+      flex: 0 0 auto;
+    }
+
+    .brand-group { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-logo { width: 48px; height: 48px; object-fit: contain; flex: 0 0 auto; border-radius: 10px; background: var(--white); }
+    .brand-text { min-width: 0; }
+    .brand-title { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -0.01em; color: var(--slate-900); white-space: nowrap; }
+    .brand-subtitle { margin: 2px 0 0; font-size: 12px; font-weight: 600; color: var(--brand); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .view-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: var(--slate-100);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--slate-200);
+      gap: 4px;
+      flex: 0 0 auto;
+    }
+
+    .view-switch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 34px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--slate-600);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .view-switch-btn svg { width: 15px; height: 15px; }
+    .view-switch-btn:hover { color: var(--slate-900); }
+    .view-switch-btn.is-active { background: var(--slate-900); color: var(--white); box-shadow: var(--shadow-sm); }
+
+    .header-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+    .search-wrap { position: relative; width: 230px; }
+
+    .search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 34px 0 34px;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      background: var(--slate-50);
+      color: var(--slate-900);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+    }
+
+    .search-input:focus { background: var(--white); border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--slate-400); pointer-events: none; }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--slate-400); cursor: pointer; display: none; align-items: center; justify-content: center; padding: 0; font-size: 15px; }
+
+    .search-results {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      box-shadow: var(--shadow-md);
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+      z-index: 200;
+    }
+
+    .search-results.is-open { display: block; }
+    .search-item { width: 100%; border: 0; background: transparent; padding: 9px 12px; text-align: left; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--slate-800); border-bottom: 1px solid var(--slate-100); }
+    .search-item:last-child { border-bottom: 0; }
+    .search-item:hover { background: var(--slate-50); }
+    .search-item-code { font-weight: 700; }
+
+    .status-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: capitalize; }
+    .status-pill.available { background: var(--green-soft); color: #047857; }
+    .status-pill.sold { background: var(--red-soft); color: #b91c1c; }
+    .status-pill.reserved { background: var(--purple-soft); color: #6d28d9; }
+    .status-pill.review { background: var(--amber-soft); color: #b45309; }
+    .status-pill.tower { background: var(--blue-soft); color: #1d4ed8; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 38px;
+      padding: 0 13px;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      background: var(--white);
+      color: var(--slate-700);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: var(--slate-50); border-color: var(--slate-400); color: var(--slate-900); }
+    .btn svg { width: 15px; height: 15px; flex: 0 0 auto; }
+
+    /* ---------- Views Container ---------- */
+    .views-container { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+    .app-view { width: 100%; height: 100%; display: none; }
+    .app-view.is-active { display: block; }
+
+    /* ---------- VIEW 1: Site Plan ---------- */
+    .siteplan-view { position: relative; background: #eef2f6; overflow: hidden; }
+    #dashboard { width: 100%; height: 100%; padding: 0; overflow: auto; background: #eef2f6; cursor: grab; user-select: none; }
+    #dashboard.is-panning { cursor: grabbing; }
+    #dashboard.is-panning * { cursor: grabbing !important; }
+    #zoomContent { position: relative; margin: 0 auto; }
+    #sitePlanShell { position: relative; display: inline-block; background: var(--white); line-height: 0; transform-origin: 0 0; box-shadow: var(--shadow-md); }
+    #pdfCanvas { display: block; }
+    #pinLayer { position: absolute; left: 0; top: 0; pointer-events: none; }
+
+    .pin { position: absolute; box-sizing: border-box; transform: translate(-50%, -50%); z-index: 20; cursor: pointer; pointer-events: auto; padding: 0; margin: 0; font-size: 0; line-height: 0; transition: all 0.15s ease; }
+    .pin.is-filtered-out { opacity: 0.08; pointer-events: none; }
+
+    .house-pin { width: var(--pin-width, 0.72%); height: var(--pin-height, 0.95%); border-radius: 2px; background: rgba(239, 68, 68, 0.14); border: 1px solid rgba(239, 68, 68, 0.75); }
+    .house-pin.status-available { background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.85); }
+    .house-pin.status-sold { background: rgba(239, 68, 68, 0.16); border-color: rgba(220, 38, 38, 0.75); }
+    .house-pin.status-reserved { background: rgba(139, 92, 246, 0.24); border-color: rgba(124, 58, 237, 0.9); }
+    .house-pin.status-review { background: rgba(245, 158, 11, 0.24); border-color: rgba(217, 119, 6, 0.9); }
+    .house-pin:hover, .house-pin:focus { background: rgba(37, 99, 235, 0.28); border-color: rgba(37, 99, 235, 1); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85), 0 4px 12px rgba(37, 99, 235, 0.35); z-index: 35; }
+    .house-pin.is-highlighted { background: rgba(37, 99, 235, 0.38); border: 2px solid #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.35); z-index: 40; }
+
+    .tower-pin { width: var(--tower-pin-size, 6px); height: var(--tower-pin-size, 6px); border-radius: 50%; background: var(--slate-900); border: 1.5px solid var(--white); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.45); }
+    .tower-pin:hover, .tower-pin:focus { background: var(--blue); transform: translate(-50%, -50%) scale(1.45); z-index: 35; }
+
+    .map-filter-bar { position: absolute; top: 14px; left: 16px; z-index: 40; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); padding: 6px; border-radius: 12px; border: 1px solid var(--slate-200); box-shadow: var(--shadow-md); }
+    .filter-chip { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--slate-600); font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+    .filter-chip:hover { background: var(--slate-100); color: var(--slate-900); }
+    .filter-chip.is-active { background: var(--slate-900); color: var(--white); }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot.available { background: var(--green); }
+    .dot.sold { background: var(--red); }
+    .dot.reserved { background: var(--purple); }
+    .dot.review { background: var(--amber); }
+    .dot.tower { background: var(--slate-900); border: 1px solid var(--slate-400); }
+    .filter-chip.is-active .dot.tower { background: var(--white); }
+
+    .map-zoom-controls { position: absolute; bottom: 18px; right: 18px; z-index: 40; display: flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); padding: 5px; border-radius: 12px; border: 1px solid var(--slate-200); box-shadow: var(--shadow-md); }
+    .zoom-btn { width: 34px; height: 34px; border: 0; border-radius: 8px; background: transparent; color: var(--slate-800); font-size: 17px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .zoom-btn:hover { background: var(--slate-100); }
+    .zoom-readout { min-width: 48px; text-align: center; font-size: 12px; font-weight: 700; color: var(--slate-700); padding: 0 4px; }
+
+    /* ---------- VIEW 2: Kurdish Sorani Dashboard ---------- */
+    .analytics-view { overflow-y: auto; background: var(--slate-100); padding: 22px 24px 96px; direction: rtl; text-align: right; font-family: var(--font-ku); }
+    .analytics-container { max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .section-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .section-title { margin: 0; font-size: 20px; font-weight: 800; color: var(--slate-900); }
+    .section-sub { margin: 4px 0 0; font-size: 13px; color: var(--slate-500); }
+    .sync-badge { font-size: 12.5px; font-weight: 600; color: var(--slate-600); background: var(--white); border: 1px solid var(--slate-200); padding: 6px 14px; border-radius: 999px; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    .kpi-card { background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 16px 18px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px; min-width: 0; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--brand); box-shadow: var(--shadow-md); }
+    .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .kpi-label { font-size: 12.5px; font-weight: 700; color: var(--slate-500); }
+    .kpi-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--slate-100); color: var(--slate-700); white-space: nowrap; }
+    .kpi-tag.green { background: var(--green-soft); color: #047857; }
+    .kpi-tag.brand { background: var(--brand-soft); color: var(--brand); }
+    .kpi-tag.amber { background: var(--amber-soft); color: #b45309; }
+    .kpi-tag.purple { background: var(--purple-soft); color: #6d28d9; }
+    .kpi-tag.red { background: var(--red-soft); color: #b91c1c; }
+    .kpi-value { font-size: 23px; font-weight: 800; color: var(--slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; text-align: right; }
+    .kpi-sub { font-size: 12px; color: var(--slate-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kpi-bar { height: 6px; width: 100%; background: var(--slate-100); border-radius: 999px; overflow: hidden; }
+    .kpi-bar-fill { height: 100%; width: 0%; border-radius: 999px; background: var(--brand); transition: width 0.55s ease; }
+    .kpi-bar-fill.green { background: var(--green); }
+    .kpi-bar-fill.blue { background: var(--blue); }
+
+    .charts-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .charts-row-2 { display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; }
+    .charts-row-equal { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .panel { background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .panel-title { margin: 0; font-size: 15.5px; font-weight: 800; color: var(--slate-900); }
+    .panel-sub { font-size: 12px; color: var(--slate-500); font-weight: 600; }
+
+    .donut-wrap { position: relative; height: 225px; width: 100%; display: flex; align-items: center; justify-content: center; }
+    .donut-wrap canvas, .chart-box canvas { cursor: pointer; }
+    .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; padding-bottom: 28px; }
+    .donut-center-val { font-size: 24px; font-weight: 800; color: var(--slate-900); line-height: 1.1; direction: ltr; }
+    .donut-center-lbl { font-size: 12px; font-weight: 700; color: var(--slate-500); margin-top: 3px; }
+    .chart-box { position: relative; height: 285px; width: 100%; }
+
+    .dynamic-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .cat-list { display: flex; flex-direction: column; gap: 8px; }
+    .cat-row { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+    .cat-row:hover { background: var(--slate-50); }
+    .cat-row-top { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; gap: 8px; }
+    .cat-row-name { font-weight: 700; color: var(--slate-800); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cat-row-meta { font-weight: 700; color: var(--slate-600); white-space: nowrap; direction: ltr; }
+
+    .table-scroll { overflow-x: auto; border: 1px solid var(--slate-200); border-radius: 10px; }
+    .analytics-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .analytics-table th { background: var(--slate-50); color: var(--slate-600); font-size: 12px; font-weight: 700; padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--slate-200); white-space: nowrap; }
+    .analytics-table td { padding: 10px 12px; border-bottom: 1px solid var(--slate-100); color: var(--slate-800); text-align: right; white-space: nowrap; }
+    .analytics-table tbody tr:last-child td { border-bottom: 0; }
+    .analytics-table tbody tr.is-clickable { cursor: pointer; }
+    .analytics-table tbody tr.is-clickable:hover td { background: var(--slate-50); }
+
+    .num-cell { font-variant-numeric: tabular-nums; font-weight: 600; direction: ltr; text-align: right; }
+    .mini-bar-wrap { display: flex; align-items: center; gap: 8px; min-width: 125px; }
+    .mini-bar { flex: 1 1 auto; height: 6px; background: var(--slate-100); border-radius: 999px; overflow: hidden; }
+    .mini-bar-fill { height: 100%; border-radius: 999px; background: var(--blue); }
+    .type-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 6px; background: var(--slate-100); color: var(--slate-600); }
+    .type-badge.Numeric { background: var(--green-soft); color: #047857; }
+    .type-badge.Category { background: var(--blue-soft); color: #1d4ed8; }
+
+    /* ---------- Floating Gemini Kurdish Voice Assistant ---------- */
+    .ai-fab {
+      position: fixed;
+      bottom: 22px;
+      left: 22px;
+      z-index: 900;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      height: 48px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+      color: var(--white);
+      font-family: var(--font-ku);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.38);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .ai-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(37, 99, 235, 0.48); }
+    .ai-fab svg { width: 18px; height: 18px; }
+
+    .ai-panel {
+      position: fixed;
+      bottom: 80px;
+      left: 22px;
+      width: min(400px, calc(100vw - 32px));
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: 18px;
+      box-shadow: var(--shadow-lg);
+      z-index: 950;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      direction: rtl;
+      text-align: right;
+      font-family: var(--font-ku);
+    }
+
+    .ai-panel.is-open { display: flex; }
+
+    .ai-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: var(--white);
+    }
+
+    .ai-panel-title { font-size: 14.5px; font-weight: 800; margin: 0; }
+    .ai-panel-close { border: 0; background: rgba(255,255,255,0.16); color: var(--white); width: 28px; height: 28px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700; }
+
+    .ai-panel-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 430px;
+      overflow-y: auto;
+    }
+
+    .ai-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ai-chip {
+      border: 1px solid var(--slate-200);
+      background: var(--slate-50);
+      color: var(--slate-700);
+      font-family: var(--font-ku);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .ai-chip:hover { background: var(--blue-soft); border-color: var(--blue); color: #1d4ed8; }
+
+    .ai-response-box {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--slate-800);
+      white-space: pre-line;
+      display: none;
+    }
+
+    .ai-response-box.is-visible { display: block; }
+    .ai-transcript { font-size: 12px; color: var(--slate-500); margin-bottom: 6px; font-weight: 600; }
+
+    .ai-open-list-btn {
+      margin-top: 10px;
+      width: 100%;
+      height: 36px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--brand);
+      color: var(--white);
+      font-family: var(--font-ku);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ai-open-list-btn:hover { background: var(--brand-dark); }
+
+    .ai-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--slate-200);
+      background: var(--slate-50);
+    }
+
+    .ai-mic-btn {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 50%;
+      background: var(--blue);
+      color: var(--white);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .ai-mic-btn.is-recording {
+      background: var(--red);
+      animation: micPulse 1.1s infinite;
+    }
+
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55); }
+      50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    }
+
+    .ai-text-input {
+      flex: 1 1 auto;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      background: var(--white);
+      font-family: var(--font-ku);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .ai-text-input:focus { border-color: var(--blue); }
+
+    .ai-send-btn {
+      height: 40px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--slate-900);
+      color: var(--white);
+      font-family: var(--font-ku);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Drill-Down Modal */
+    .drilldown-wrap { direction: rtl; text-align: right; font-family: var(--font-ku); display: flex; flex-direction: column; gap: 12px; }
+    .drilldown-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .drilldown-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .drilldown-count { font-size: 13px; font-weight: 700; color: var(--slate-600); background: var(--slate-100); padding: 5px 12px; border-radius: 999px; }
+    .drilldown-filter-input { height: 36px; min-width: 210px; padding: 0 12px; border: 1px solid var(--slate-200); border-radius: 9px; background: var(--slate-50); font-family: var(--font-ku); font-size: 13px; outline: none; }
+    .drilldown-filter-input:focus { background: var(--white); border-color: var(--brand); }
+    .export-csv-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 9px; background: var(--green-dark); color: var(--white); font-family: var(--font-ku); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .export-csv-btn:hover { background: #047857; }
+    .export-csv-btn svg { width: 15px; height: 15px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--slate-900); color: var(--white); padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 2500; max-width: 90vw; }
+    .toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .toast.is-error { background: #b91c1c; }
+
+    /* ---------- Architectural CAD Loading Screen ---------- */
+    .loading-screen { position: fixed; z-index: 3000; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; background: #ffffff; transition: opacity 0.4s ease, visibility 0.4s ease; }
+    .loading-screen.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .cad-loader-card { width: min(720px, 94vw); display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none; }
+    .cad-scene { width: 100%; height: auto; display: block; overflow: visible; }
+    .cad-brand-title { margin: 14px 0 0; font-family: "Calibri", "Carlito", "Segoe UI", Arial, sans-serif; font-size: clamp(32px, 5.4vw, 56px); font-weight: 700; letter-spacing: 0.18em; color: #111111; text-align: center; line-height: 1.05; padding-left: 0.18em; }
+    .cad-boom-group { transform-origin: 184px 168px; animation: cadBoomCycle 3.6s ease-in-out infinite; }
+    .cad-stick-group { transform-origin: 266px 96px; animation: cadStickCycle 3.6s ease-in-out infinite; }
+    .cad-bucket-group { transform-origin: 332px 132px; animation: cadBucketCycle 3.6s ease-in-out infinite; }
+    .cad-truck-chassis { transform-origin: 480px 214px; animation: cadTruckSuspension 3.6s ease-in-out infinite; }
+    .cad-bed-mound { transform-origin: 424px 170px; animation: cadMoundRise 3.6s ease-in-out infinite; }
+    .cad-rock-1 { animation: cadRockFall1 3.6s linear infinite; }
+    .cad-rock-2 { animation: cadRockFall2 3.6s linear infinite; }
+    .cad-rock-3 { animation: cadRockFall3 3.6s linear infinite; }
+    .cad-rock-4 { animation: cadRockFall4 3.6s linear infinite; }
+    @keyframes cadBoomCycle { 0%, 100% { transform: rotate(22deg); } 18% { transform: rotate(28deg); } 44%, 68% { transform: rotate(-14deg); } 86% { transform: rotate(10deg); } }
+    @keyframes cadStickCycle { 0%, 100% { transform: rotate(18deg); } 18% { transform: rotate(34deg); } 44% { transform: rotate(-22deg); } 68% { transform: rotate(-26deg); } 86% { transform: rotate(4deg); } }
+    @keyframes cadBucketCycle { 0%, 100% { transform: rotate(10deg); } 18% { transform: rotate(48deg); } 44% { transform: rotate(42deg); } 56% { transform: rotate(-56deg); } 68% { transform: rotate(-58deg); } 86% { transform: rotate(0deg); } }
+    @keyframes cadTruckSuspension { 0%, 54%, 100% { transform: translateY(0px); } 62% { transform: translateY(3px); } 68% { transform: translateY(-1px); } 74% { transform: translateY(1.5px); } 82% { transform: translateY(0px); } }
+    @keyframes cadMoundRise { 0%, 55% { transform: scaleY(0.55); opacity: 0.75; } 66%, 90% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(0.55); opacity: 0.75; } }
+    @keyframes cadRockFall1 { 0%, 50% { opacity: 0; transform: translate(0px, 0px) rotate(0deg); } 53% { opacity: 1; transform: translate(4px, 4px) rotate(12deg); } 64% { opacity: 1; transform: translate(16px, 52px) rotate(78deg); } 67%, 100% { opacity: 0; transform: translate(18px, 60px) rotate(95deg); } }
+    @keyframes cadRockFall2 { 0%, 53% { opacity: 0; transform: translate(0px, 0px) rotate(0deg); } 56% { opacity: 1; transform: translate(-2px, 5px) rotate(-18deg); } 67% { opacity: 1; transform: translate(6px, 54px) rotate(-85deg); } 70%, 100% { opacity: 0; transform: translate(8px, 62px) rotate(-105deg); } }
+    @keyframes cadRockFall3 { 0%, 55% { opacity: 0; transform: translate(0px, 0px) rotate(0deg); } 58% { opacity: 1; transform: translate(8px, 6px) rotate(24deg); } 69% { opacity: 1; transform: translate(22px, 54px) rotate(110deg); } 72%, 100% { opacity: 0; transform: translate(24px, 62px) rotate(125deg); } }
+    @keyframes cadRockFall4 { 0%, 58% { opacity: 0; transform: translate(0px, 0px) rotate(0deg); } 61% { opacity: 1; transform: translate(2px, 6px) rotate(-14deg); } 71% { opacity: 1; transform: translate(12px, 52px) rotate(-72deg); } 74%, 100% { opacity: 0; transform: translate(14px, 58px) rotate(-90deg); } }
+
+    /* ---------- Modal ---------- */
+    .modal-backdrop { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(15, 23, 42, 0.58); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 16px; }
+    .modal { width: min(920px, 96vw); max-height: 88vh; display: flex; flex-direction: column; background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: modalIn 0.18s ease-out; }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal.unit-plan-modal { width: 96vw; height: 92vh; max-height: 92vh; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--slate-200); background: var(--white); flex: 0 0 auto; }
+    .modal-title-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .modal-header h2 { margin: 0; font-size: 17px; font-weight: 800; color: var(--slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-ku); }
+    .modal-header-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+    .modal-back-btn { display: none; height: 32px; padding: 0 11px; border: 1px solid var(--slate-200); border-radius: 8px; background: var(--slate-50); color: var(--slate-700); font-family: var(--font-ku); font-size: 12.5px; font-weight: 700; cursor: pointer; align-items: center; }
+    .modal-close { height: 32px; padding: 0 12px; border: 0; background: var(--slate-100); color: var(--slate-700); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; }
+    .modal-tabs { display: none; align-items: center; gap: 6px; padding: 10px 18px; background: var(--slate-50); border-bottom: 1px solid var(--slate-200); flex: 0 0 auto; }
+    .modal-tabs.is-visible { display: flex; }
+    .modal-tab { border: 1px solid transparent; background: transparent; color: var(--slate-600); padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .modal-tab.is-active { background: var(--white); border-color: var(--slate-200); color: var(--brand); box-shadow: var(--shadow-sm); }
+    .modal-body { padding: 16px 18px; line-height: 1.45; overflow-y: auto; flex: 1 1 auto; min-height: 0; }
+    .unit-plan-modal .modal-body { display: flex; flex-direction: column; gap: 10px; overflow: hidden; padding: 12px 16px; }
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; border: 1px solid var(--slate-200); border-radius: 10px; overflow: hidden; }
+    .data-table th, .data-table td { vertical-align: middle; border-bottom: 1px solid var(--slate-200); padding: 9px 12px; }
+    .data-table tr:last-child th, .data-table tr:last-child td { border-bottom: 0; }
+    .data-table th { width: 36%; color: var(--slate-700); background: var(--slate-50); font-weight: 700; text-align: right; border-left: 1px solid var(--slate-200); }
+    .data-table td { width: 64%; text-align: left; background: var(--white); }
+    .empty-message { color: var(--slate-500); text-align: center; padding: 28px 12px; font-size: 14px; font-weight: 500; }
+
+    .floor-header-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .floor-help { margin: 0; color: var(--slate-600); font-size: 13.5px; }
+    .floor-legend { display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 700; color: var(--slate-600); flex-wrap: wrap; }
+    .floor-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+    .floor-grid { display: grid; grid-template-columns: repeat(4, minmax(70px, 1fr)); gap: 10px; }
+    .floor-button { background: var(--slate-900); color: var(--white); border: 1.5px solid transparent; padding: 12px 10px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .floor-button.status-available { background: var(--green-soft); border-color: var(--green); color: #065f46; }
+    .floor-button.status-sold { background: var(--red-soft); border-color: var(--red); color: #991b1b; }
+    .floor-button.status-reserved { background: var(--purple-soft); border-color: var(--purple); color: #5b21b6; }
+    .floor-button.status-review { background: var(--amber-soft); border-color: var(--amber); color: #92400e; }
+    .floor-status-sub { font-size: 11px; font-weight: 700; opacity: 0.9; }
+    .code-preview { margin-top: 14px; font-size: 13px; color: var(--slate-500); background: var(--slate-50); padding: 9px 12px; border-radius: 8px; border: 1px solid var(--slate-200); }
+
+    .unit-plan-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 0 0 auto; }
+    .unit-plan-toolbar a { display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 12px; border-radius: 8px; background: var(--slate-900); color: var(--white); font-size: 12.5px; font-weight: 700; text-decoration: none; }
+    .unit-plan-zoom-note { margin-left: auto; color: var(--slate-500); font-size: 12px; font-weight: 600; }
+    .unit-plan-viewport { flex: 1 1 auto; min-height: 0; overflow: hidden; border: 1px solid var(--slate-200); border-radius: 12px; background: var(--slate-50); display: flex; align-items: center; justify-content: center; touch-action: none; cursor: zoom-in; position: relative; }
+    .unit-plan-viewport.is-zoomed { cursor: grab; }
+    .unit-plan-viewport.is-panning { cursor: grabbing; }
+    .unit-plan-main-image { max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: center center; user-select: none; pointer-events: none; transition: transform 0.08s ease; }
+    .unit-plan-thumbs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 2px; min-height: 82px; flex: 0 0 auto; }
+    .unit-thumb { width: 96px; height: 72px; flex: 0 0 auto; padding: 0; border-radius: 8px; border: 2px solid transparent; background: var(--white); overflow: hidden; cursor: pointer; }
+    .unit-thumb.is-active { border-color: var(--brand); }
+    .unit-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    @media (max-width: 1180px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .charts-row-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .charts-row-2 { grid-template-columns: 1fr; }
+      .dynamic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 820px) {
+      .app-header { flex-wrap: wrap; padding: 10px 12px; gap: 10px; }
+      .brand-logo { width: 40px; height: 40px; }
+      .brand-title { font-size: 15px; }
+      .brand-subtitle { display: none; }
+      .view-switcher { order: 3; width: 100%; }
+      .view-switch-btn { flex: 1 1 50%; justify-content: center; }
+      .header-actions { margin-left: auto; }
+      .search-wrap { width: 170px; }
+      .analytics-view { padding: 14px 12px 90px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .charts-row-3, .charts-row-equal, .dynamic-grid { grid-template-columns: 1fr; }
+      .kpi-value { font-size: 18px; }
+      .floor-grid { grid-template-columns: repeat(3, minmax(70px, 1fr)); }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Architectural CAD Line-Art Loading Screen -->
+  <div id="loadingScreen" class="loading-screen" aria-live="polite" aria-busy="true">
+    <div class="cad-loader-card">
+      <svg class="cad-scene" viewBox="0 0 640 265" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shari Sharan loading">
+        <g stroke="#111111" stroke-width="1.6" fill="#ffffff" stroke-linejoin="round">
+          <polygon class="cad-rock-1" points="354,116 361,113 364,119 358,123 352,120" />
+          <polygon class="cad-rock-2" points="366,118 372,116 374,122 368,125 364,121" />
+          <polygon class="cad-rock-3" points="358,121 364,119 366,125 360,127" />
+          <polygon class="cad-rock-4" points="362,115 367,114 369,119 364,121" />
+        </g>
+
+        <g stroke="#111111" stroke-linecap="round" stroke-linejoin="round">
+          <g class="cad-boom-group">
+            <path d="M 184 168 L 238 112 L 266 96 L 269 104 L 245 123 L 194 176 Z" fill="#ffffff" stroke-width="1.8" />
+            <line x1="196" y1="184" x2="226" y2="146" stroke-width="2.2" />
+            <line x1="226" y1="146" x2="241" y2="127" stroke-width="1.4" />
+            <line x1="218" y1="126" x2="246" y2="104" stroke-width="1.8" />
+            <line x1="246" y1="104" x2="262" y2="92" stroke-width="1.2" />
+            <g class="cad-stick-group">
+              <path d="M 262 93 L 272 95 L 335 130 L 330 135 L 265 103 Z" fill="#ffffff" stroke-width="1.8" />
+              <line x1="286" y1="103" x2="314" y2="117" stroke-width="1.7" />
+              <line x1="314" y1="117" x2="328" y2="124" stroke-width="1.2" />
+              <g class="cad-bucket-group">
+                <path d="M 332 132 L 348 130 C 358 134 360 148 352 156 L 330 154 L 325 144 Z" fill="#ffffff" stroke-width="1.8" />
+                <path d="M 330 154 L 325 159 M 336 155 L 332 160 M 342 155 L 339 160" stroke-width="1.5" />
+                <circle cx="332" cy="132" r="2.2" fill="#ffffff" stroke-width="1.4" />
+              </g>
+              <circle cx="266" cy="96" r="2.6" fill="#ffffff" stroke-width="1.5" />
+            </g>
+            <circle cx="184" cy="168" r="3" fill="#ffffff" stroke-width="1.6" />
+          </g>
+
+          <path d="M 88 188 L 88 164 C 88 158 93 154 100 154 L 154 154 L 158 164 L 194 164 L 198 188 Z" fill="#ffffff" stroke-width="1.8" />
+          <line x1="104" y1="154" x2="104" y2="188" stroke-width="1.2" />
+          <line x1="112" y1="164" x2="144" y2="164" stroke-width="1.1" />
+          <line x1="112" y1="170" x2="144" y2="170" stroke-width="1.1" />
+          <line x1="112" y1="176" x2="144" y2="176" stroke-width="1.1" />
+          <path d="M 118 154 L 118 140 L 114 136" fill="none" stroke-width="1.6" />
+          <path d="M 150 188 L 150 138 L 178 138 L 190 158 L 190 188 Z" fill="#ffffff" stroke-width="1.8" />
+          <path d="M 156 144 L 175 144 L 184 159 L 184 170 L 156 170 Z" fill="#ffffff" stroke-width="1.3" />
+          <line x1="162" y1="164" x2="174" y2="150" stroke-width="0.9" />
+          <line x1="169" y1="166" x2="178" y2="156" stroke-width="0.9" />
+          <rect x="118" y="188" width="56" height="8" fill="#ffffff" stroke-width="1.6" />
+          <rect x="92" y="196" width="112" height="24" rx="12" fill="#ffffff" stroke-width="2" />
+          <rect x="98" y="201" width="100" height="14" rx="7" fill="#ffffff" stroke-width="1.3" />
+          <circle cx="106" cy="208" r="5" fill="#ffffff" stroke-width="1.4" />
+          <circle cx="190" cy="208" r="5" fill="#ffffff" stroke-width="1.4" />
+          <circle cx="124" cy="211" r="2.6" fill="#ffffff" stroke-width="1.2" />
+          <circle cx="140" cy="211" r="2.6" fill="#ffffff" stroke-width="1.2" />
+          <circle cx="156" cy="211" r="2.6" fill="#ffffff" stroke-width="1.2" />
+          <circle cx="172" cy="211" r="2.6" fill="#ffffff" stroke-width="1.2" />
+          <circle cx="132" cy="203" r="2" fill="#ffffff" stroke-width="1.1" />
+          <circle cx="164" cy="203" r="2" fill="#ffffff" stroke-width="1.1" />
+        </g>
+
+        <g stroke="#111111" stroke-linecap="round" stroke-linejoin="round">
+          <g class="cad-truck-chassis">
+            <path class="cad-bed-mound" d="M 358 148 L 382 134 L 408 130 L 434 134 L 460 148 Z" fill="#ffffff" stroke-width="1.5" stroke-dasharray="3,2" />
+            <path d="M 332 138 L 348 146 L 478 146 L 478 134 L 494 134 L 494 146 L 486 190 L 346 190 Z" fill="#ffffff" stroke-width="1.9" />
+            <line x1="366" y1="146" x2="366" y2="190" stroke-width="1.3" />
+            <line x1="396" y1="146" x2="396" y2="190" stroke-width="1.3" />
+            <line x1="426" y1="146" x2="426" y2="190" stroke-width="1.3" />
+            <line x1="456" y1="146" x2="456" y2="190" stroke-width="1.3" />
+            <line x1="346" y1="168" x2="489" y2="168" stroke-width="1.1" />
+            <rect x="348" y="190" width="212" height="10" fill="#ffffff" stroke-width="1.8" />
+            <rect x="454" y="196" width="32" height="12" rx="2" fill="#ffffff" stroke-width="1.4" />
+            <path d="M 494 198 L 494 132 L 538 132 L 552 154 L 560 162 L 560 198 Z" fill="#ffffff" stroke-width="1.9" />
+            <path d="M 504 139 L 534 139 L 545 157 L 545 164 L 504 164 Z" fill="#ffffff" stroke-width="1.4" />
+            <line x1="514" y1="158" x2="526" y2="145" stroke-width="0.9" />
+            <line x1="522" y1="160" x2="532" y2="149" stroke-width="0.9" />
+            <line x1="549" y1="170" x2="559" y2="170" stroke-width="1.2" />
+            <line x1="549" y1="175" x2="559" y2="175" stroke-width="1.2" />
+            <line x1="549" y1="180" x2="559" y2="180" stroke-width="1.2" />
+            <rect x="553" y="185" width="7" height="6" fill="#ffffff" stroke-width="1.3" />
+            <rect x="550" y="192" width="14" height="8" rx="1" fill="#ffffff" stroke-width="1.6" />
+            <line x1="508" y1="172" x2="516" y2="172" stroke-width="1.4" />
+            <path d="M 544 144 L 551 144 L 551 156 L 547 156" fill="none" stroke-width="1.3" />
+            <path d="M 490 190 L 490 124 L 485 120" fill="none" stroke-width="1.6" />
+          </g>
+
+          <circle cx="378" cy="204" r="16" fill="#ffffff" stroke-width="2" />
+          <circle cx="378" cy="204" r="9.5" fill="#ffffff" stroke-width="1.3" />
+          <circle cx="378" cy="204" r="3.5" fill="#ffffff" stroke-width="1.3" />
+          <circle cx="418" cy="204" r="16" fill="#ffffff" stroke-width="2" />
+          <circle cx="418" cy="204" r="9.5" fill="#ffffff" stroke-width="1.3" />
+          <circle cx="418" cy="204" r="3.5" fill="#ffffff" stroke-width="1.3" />
+          <circle cx="524" cy="204" r="16" fill="#ffffff" stroke-width="2" />
+          <circle cx="524" cy="204" r="9.5" fill="#ffffff" stroke-width="1.3" />
+          <circle cx="524" cy="204" r="3.5" fill="#ffffff" stroke-width="1.3" />
+        </g>
+
+        <g stroke="#111111" stroke-linecap="round">
+          <line x1="36" y1="221" x2="604" y2="221" stroke-width="1.6" />
+          <line x1="56" y1="221" x2="56" y2="227" stroke-width="1.1" />
+          <line x1="168" y1="221" x2="168" y2="226" stroke-width="1" />
+          <line x1="320" y1="221" x2="320" y2="229" stroke-width="1.2" />
+          <line x1="472" y1="221" x2="472" y2="226" stroke-width="1" />
+          <line x1="584" y1="221" x2="584" y2="227" stroke-width="1.1" />
+          <line x1="32" y1="225" x2="40" y2="217" stroke-width="1.1" />
+          <line x1="600" y1="225" x2="608" y2="217" stroke-width="1.1" />
+        </g>
+      </svg>
+
+      <div class="cad-brand-title">SHARI SHARAN</div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-group">
+        <img
+          class="brand-logo"
+          alt="Shari Sharan Residentials logo"
+          src="https://drive.google.com/thumbnail?id=10qaNWF9k6xwHo_wah7tVWH8V9UDJJlEH&sz=w500"
+        >
+        <div class="brand-text">
+          <h1 class="brand-title">Shari Sharan</h1>
+          <p class="brand-subtitle">Leading Kurdistan with the fastest project progress</p>
+        </div>
+      </div>
+
+      <nav class="view-switcher" role="tablist" aria-label="Workspace View">
+        <button id="btnViewSitePlan" class="view-switch-btn is-active" type="button" data-view="siteplan" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          <span>Site Plan</span>
+        </button>
+
+        <button id="btnViewDashboard" class="view-switch-btn" type="button" data-view="dashboard" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="unitSearchInput"
+            class="search-input"
+            type="text"
+            placeholder="Find unit (1-A3-66, 1-A-02-01)"
+            autocomplete="off"
+          >
+          <button id="unitSearchClear" class="search-clear" type="button" aria-label="Clear search">&times;</button>
+          <div id="unitSearchResults" class="search-results"></div>
+        </div>
+
+        <button id="refreshDataBtn" class="btn" type="button" title="Refresh live sheet data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Views Container -->
+    <div class="views-container">
+      <!-- VIEW 1: Site Plan -->
+      <section id="viewSitePlan" class="app-view siteplan-view is-active" aria-label="Interactive Site Plan">
+        <div class="map-filter-bar" role="group" aria-label="Filter map pins">
+          <button class="filter-chip is-active" type="button" data-filter="all">All</button>
+          <button class="filter-chip" type="button" data-filter="available">
+            <span class="dot available"></span>Available
+          </button>
+          <button class="filter-chip" type="button" data-filter="sold">
+            <span class="dot sold"></span>Sold
+          </button>
+          <button class="filter-chip" type="button" data-filter="reserved">
+            <span class="dot reserved"></span>Reserved
+          </button>
+          <button class="filter-chip" type="button" data-filter="review">
+            <span class="dot review"></span>Review
+          </button>
+          <button class="filter-chip" type="button" data-filter="towers">
+            <span class="dot tower"></span>Towers
+          </button>
+        </div>
+
+        <div id="dashboard">
+          <div id="zoomContent">
+            <div id="sitePlanShell">
+              <canvas id="pdfCanvas"></canvas>
+              <div id="pinLayer"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-zoom-controls" aria-label="Map zoom controls">
+          <button id="zoomOutBtn" class="zoom-btn" type="button" title="Zoom out">&minus;</button>
+          <span id="zoomReadout" class="zoom-readout">100%</span>
+          <button id="zoomInBtn" class="zoom-btn" type="button" title="Zoom in">+</button>
+          <button id="zoomResetBtn" class="zoom-btn" type="button" title="Reset zoom" style="font-size:13px;">Fit</button>
+        </div>
+      </section>
+
+      <!-- VIEW 2: Full Executive Dashboard (Kurdish Sorani) -->
+      <section id="viewDashboard" class="app-view analytics-view" dir="rtl" lang="ckb" aria-label="داشبۆردی فرۆشتن و دارایی پڕۆژە">
+        <div class="analytics-container">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">داشبۆردی فرۆشتن و دارایی شاری شاران</h2>
+              <p class="section-sub">کرتە لە هەر ژمارە یان هێڵکارییەک بکە بۆ بینینی لیستی وردی یەکەکان و داگرتنی فایل</p>
+            </div>
+            <span id="dashUpdatedBadge" class="sync-badge">خەریکی نوێکردنەوەی داتاکانە...</span>
+          </div>
+
+          <!-- Row 1: Primary KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card" id="cardKpiSold" title="کرتە بکە بۆ بینینی هەموو یەکە فرۆشراوەکان">
+              <div class="kpi-top">
+                <span class="kpi-label">یەکە فرۆشراوەکان</span>
+                <span id="kpiSoldRate" class="kpi-tag brand">--%</span>
+              </div>
+              <div id="kpiSoldValue" class="kpi-value">-- / --</div>
+              <div class="kpi-bar"><div id="kpiSoldBar" class="kpi-bar-fill"></div></div>
+              <div id="kpiBreakdown" class="kpi-sub">خانوو: -- • شوقە: --</div>
+            </div>
+
+            <div class="kpi-card" id="cardKpiAvailable" title="کرتە بکە بۆ بینینی هەموو یەکە بەردەستەکان">
+              <div class="kpi-top">
+                <span class="kpi-label">یەکە بەردەستەکان</span>
+                <span id="kpiReservedTag" class="kpi-tag purple" style="display:none;">0 حجزکراو</span>
+              </div>
+              <div id="kpiAvailableValue" class="kpi-value">--</div>
+              <div class="kpi-bar"><div id="kpiAvailableBar" class="kpi-bar-fill blue"></div></div>
+              <div id="kpiAvailableSub" class="kpi-sub">خانوو: -- • شوقە: --</div>
+            </div>
+
+            <div class="kpi-card" id="cardKpiContract" title="کرتە بکە بۆ بینینی یەکە گرێبەستکراوەکان">
+              <div class="kpi-top">
+                <span class="kpi-label">کۆی بەهای گرێبەستەکان</span>
+                <span class="kpi-tag">تەنها فرۆشراو</span>
+              </div>
+              <div id="kpiSoldContractValue" class="kpi-value">--</div>
+              <div id="kpiTotalInventorySub" class="kpi-sub">ماوەی گرێبەست: --</div>
+            </div>
+
+            <div class="kpi-card" id="cardKpiCollected" title="کرتە بکە بۆ بینینی ئەو یەکانەی پارەیان داوە">
+              <div class="kpi-top">
+                <span class="kpi-label">داهاتی کۆکراوە (بڕی دراو)</span>
+                <span id="kpiCollectionRate" class="kpi-tag green">--%</span>
+              </div>
+              <div id="kpiCollectedValue" class="kpi-value">--</div>
+              <div class="kpi-bar"><div id="kpiCollectionBar" class="kpi-bar-fill green"></div></div>
+              <div id="kpiDueSub" class="kpi-sub">لە بڕی داواکراو: --%</div>
+            </div>
+
+            <div class="kpi-card" id="cardKpiDebt" title="کرتە بکە بۆ بینینی هەموو یەکە قەرزارەکان">
+              <div class="kpi-top">
+                <span class="kpi-label">قەرزی دواکەوتوو</span>
+                <span id="kpiDebtPctTag" class="kpi-tag red">--%</span>
+              </div>
+              <div id="kpiOutstandingValue" class="kpi-value">--</div>
+              <div id="kpiOverdueSub" class="kpi-sub">لە کۆی بڕی داواکراو: --</div>
+            </div>
+          </div>
+
+          <!-- Row 2: Circle Percentage Charts (Donuts) -->
+          <div class="charts-row-3">
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">ڕێژەی فرۆشتن و حجز</h3>
+                <span class="panel-sub">کرتە لە هەر بەشێک بکە</span>
+              </div>
+              <div class="donut-wrap">
+                <canvas id="chartSalesDonut"></canvas>
+                <div class="donut-center">
+                  <div id="centerSalesPct" class="donut-center-val">--%</div>
+                  <div class="donut-center-lbl">فرۆشراو</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">کۆکردنەوەی بەهای گرێبەست</h3>
+                <span class="panel-sub">بڕی دراو بەرامبەر ماوەی گرێبەست</span>
+              </div>
+              <div class="donut-wrap">
+                <canvas id="chartCollectionDonut"></canvas>
+                <div class="donut-center">
+                  <div id="centerCollectionPct" class="donut-center-val">--%</div>
+                  <div class="donut-center-lbl">کۆکراوە</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">دابەشبوونی جۆری یەکەکان</h3>
+                <span class="panel-sub">خانوو و شوقە</span>
+              </div>
+              <div class="donut-wrap">
+                <canvas id="chartUnitMixDonut"></canvas>
+                <div class="donut-center">
+                  <div id="centerTotalUnits" class="donut-center-val">--</div>
+                  <div class="donut-center-lbl">کۆی یەکەکان</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Reserved Units Breakdown (حجز) -->
+          <div class="charts-row-2">
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">شیکاری یەکە حجزکراوەکان (حجز)</h3>
+                <span id="reservedHeaderSummary" class="panel-sub">ژمارەی یەکەکان (ستوون) + کۆی نرخ بە دۆلار (هێڵ)</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="chartReservedCombo"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">خشتەی جۆرەکانی حجز</h3>
+                <span class="panel-sub">کرتە لە هەر جۆرێک بکە بۆ بینینی یەکەکانی</span>
+              </div>
+              <div class="table-scroll">
+                <table class="analytics-table">
+                  <thead>
+                    <tr>
+                      <th>جۆری حجز</th>
+                      <th>ژمارەی یەکە</th>
+                      <th>ڕێژە</th>
+                      <th>کۆی نرخ ($)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reservedTableBody">
+                    <tr><td colspan="4" style="text-align:center;color:#64748b;">خەریکی بارکردنە...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: Zone/Tower Combo Chart + Collection Progress Line Chart -->
+          <div class="charts-row-2">
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">ئەدای زۆن و تاوەرەکان</h3>
+                <span class="panel-sub">کرتە لە هەر ستوونێک بکە بۆ بینینی یەکەکانی</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="chartZonesCombo"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">هێڵکاری ڕێژەی پارەدان</h3>
+                <span class="panel-sub">کرتە لە هەر خاڵێک بکە بۆ بینینی یەکەکانی</span>
+              </div>
+              <div class="chart-box">
+                <canvas id="chartCollectionLine"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5: All Numeric Columns & Top Overdue -->
+          <div class="charts-row-equal">
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">پوختەی هەموو ستوونە ژمارەییەکان</h3>
+                <span class="panel-sub">کۆی گشتی و تێکڕای خۆکار</span>
+              </div>
+              <div class="table-scroll">
+                <table class="analytics-table">
+                  <thead>
+                    <tr>
+                      <th>ناوی ستوون</th>
+                      <th>کۆی گشتی</th>
+                      <th>تێکڕا</th>
+                      <th>کەمترین / زۆرترین</th>
+                      <th>پڕکراوە</th>
+                    </tr>
+                  </thead>
+                  <tbody id="numericColumnsBody">
+                    <tr><td colspan="5" style="text-align:center;color:#64748b;">خەریکی بارکردنە...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title">بەرزترین قەرزی دواکەوتوو</h3>
+                <span class="panel-sub">کرتە لە هەر یەکەیەک بکە بۆ بینینی وردەکاری</span>
+              </div>
+              <div class="table-scroll">
+                <table class="analytics-table">
+                  <thead>
+                    <tr>
+                      <th>ژمارەی یەکە</th>
+                      <th>خاوەن یەکە</th>
+                      <th>کۆی نرخ</th>
+                      <th>ڕێژەی دراو</th>
+                      <th>قەرزی دواکەوتوو</th>
+                    </tr>
+                  </thead>
+                  <tbody id="topDebtBody">
+                    <tr><td colspan="5" style="text-align:center;color:#64748b;">خەریکی بارکردنە...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 6: Dynamic Categorical Columns -->
+          <div id="categoricalSection" style="display:none;">
+            <div class="section-header" style="margin-bottom:12px;">
+              <div>
+                <h3 class="section-title" style="font-size:17px;">شیکاری هەموو ستوونە پۆلێنکراوەکان</h3>
+                <p class="section-sub">کرتە لە هەر بڕگەیەک بکە بۆ بینینی هەموو یەکەکانی ئەو پۆلێنە</p>
+              </div>
+            </div>
+            <div id="categoricalGrid" class="dynamic-grid"></div>
+          </div>
+
+          <!-- Row 7: All Columns Data Completeness -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="panel-title">تەواوی ستوونەکانی خشتە — ڕێژەی پڕبوونەوە</h3>
+              <span class="panel-sub">پشکنینی کوالێتی داتا بۆ هەموو ستوونە چالاکەکان</span>
+            </div>
+            <div class="table-scroll">
+              <table class="analytics-table">
+                <thead>
+                  <tr>
+                    <th>ناوی ستوون</th>
+                    <th>جۆر</th>
+                    <th>پڕکراوە</th>
+                    <th>بەتاڵ</th>
+                    <th>هەڵە</th>
+                    <th>ڕێژەی تەواوبوون</th>
+                  </tr>
+                </thead>
+                <tbody id="allColumnsHealthBody">
+                  <tr><td colspan="6" style="text-align:center;color:#64748b;">خەریکی بارکردنە...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Floating Kurdish Sorani Gemini Voice Assistant -->
+  <button id="aiFabBtn" class="ai-fab" type="button" title="یاریدەدەری دەنگی Gemini">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+      <line x1="12" y1="19" x2="12" y2="23"></line>
+      <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+    <span>یاریدەدەری دەنگی</span>
+  </button>
+
+  <div id="aiPanel" class="ai-panel" role="dialog" aria-label="یاریدەدەری دەنگی Gemini">
+    <div class="ai-panel-header">
+      <h3 class="ai-panel-title">یاریدەدەری دەنگی Gemini (کوردی)</h3>
+      <button id="aiPanelClose" class="ai-panel-close" type="button">&times;</button>
+    </div>
+
+    <div class="ai-panel-body">
+      <div class="ai-chips">
+        <button type="button" class="ai-chip" data-q="چەند یەکە قەرزەکەیان لە ١٠ هەزار دۆلار زیاترە؟">قەرز زیاتر لە $10,000</button>
+        <button type="button" class="ai-chip" data-q="شوقە بەردەستەکانی تاوەری A پیشان بدە">بەردەستەکانی تاوەری A</button>
+        <button type="button" class="ai-chip" data-q="کۆی حجز - مقاول چەندە؟">حجز - مقاول</button>
+        <button type="button" class="ai-chip" data-q="پوختەی گشتی پڕۆژە بدە">پوختەی گشتی</button>
+      </div>
+
+      <div id="aiResponseBox" class="ai-response-box"></div>
+    </div>
+
+    <div class="ai-controls">
+      <button id="aiMicBtn" class="ai-mic-btn" type="button" title="کرتە بکە بۆ تۆمارکردنی دەنگ">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+        </svg>
+      </button>
+      <input id="aiTextInput" class="ai-text-input" type="text" placeholder="پرسیارەکەت بە کوردی بنووسە یان قسە بکە...">
+      <button id="aiSendBtn" class="ai-send-btn" type="button">ناردن</button>
+    </div>
+  </div>
+
+  <div id="toastBanner" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Modern Tabbed Modal -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div id="mainModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h2 id="modalTitle">Details</h2>
+        </div>
+        <div class="modal-header-actions">
+          <button id="modalBackBtn" class="modal-back-btn" type="button">&larr; Back</button>
+          <button class="modal-close" type="button" id="modalCloseBtn">Close</button>
+        </div>
+      </div>
+
+      <div id="modalTabs" class="modal-tabs" role="tablist">
+        <button class="modal-tab is-active" type="button" data-tab="installment" role="tab">Installment</button>
+        <button class="modal-tab" type="button" data-tab="work" role="tab">Work Progress</button>
+        <button class="modal-tab" type="button" data-tab="unitplan" role="tab">Unit Plan</button>
+      </div>
+
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    if (typeof Chart !== 'undefined') {
+      Chart.defaults.font.family = '"Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif';
+    }
+
+    var PDF_PAGE_NUMBER = 1;
+    var PIN_NUDGE_X_PERCENT = 0;
+    var PIN_NUDGE_Y_PERCENT = 0;
+    var DEFAULT_HOUSE_PIN_WIDTH_PERCENT = 0.72;
+    var DEFAULT_HOUSE_PIN_HEIGHT_PERCENT = 0.95;
+    var TOWER_PIN_SIZE_PX = 6;
+
+    var PLAN_ZOOM = 1;
+    var MIN_ZOOM = 0.45;
+    var MAX_ZOOM = 5;
+
+    var PDF_RENDER_QUALITY = 4;
+    var MAX_CANVAS_PIXELS = 45000000;
+    var TOWER_SHEET_CODE_PREFIX = '1';
+
+    var TOWER_APARTMENT_PIN_CONFIG = [
+      { TowerLetter: 'A', ApartmentNumber: '1', X_Coord: 44.165, Y_Coord: 38.836 },
+      { TowerLetter: 'A', ApartmentNumber: '2', X_Coord: 42.191, Y_Coord: 38.836 },
+      { TowerLetter: 'A', ApartmentNumber: '3', X_Coord: 42.191, Y_Coord: 40.736 },
+      { TowerLetter: 'A', ApartmentNumber: '4', X_Coord: 44.165, Y_Coord: 40.736 },
+
+      { TowerLetter: 'B', ApartmentNumber: '1', X_Coord: 37.028, Y_Coord: 38.836 },
+      { TowerLetter: 'B', ApartmentNumber: '2', X_Coord: 35.055, Y_Coord: 38.836 },
+      { TowerLetter: 'B', ApartmentNumber: '3', X_Coord: 35.055, Y_Coord: 40.736 },
+      { TowerLetter: 'B', ApartmentNumber: '4', X_Coord: 37.028, Y_Coord: 40.736 },
+
+      { TowerLetter: 'C', ApartmentNumber: '1', X_Coord: 30.101, Y_Coord: 38.836 },
+      { TowerLetter: 'C', ApartmentNumber: '2', X_Coord: 28.128, Y_Coord: 38.836 },
+      { TowerLetter: 'C', ApartmentNumber: '3', X_Coord: 28.128, Y_Coord: 40.736 },
+      { TowerLetter: 'C', ApartmentNumber: '4', X_Coord: 30.101, Y_Coord: 40.736 },
+
+      { TowerLetter: 'D', ApartmentNumber: '1', X_Coord: 22.964, Y_Coord: 38.836 },
+      { TowerLetter: 'D', ApartmentNumber: '2', X_Coord: 20.991, Y_Coord: 38.836 },
+      { TowerLetter: 'D', ApartmentNumber: '3', X_Coord: 20.991, Y_Coord: 40.736 },
+      { TowerLetter: 'D', ApartmentNumber: '4', X_Coord: 22.964, Y_Coord: 40.736 }
+    ];
+
+    var activeView = 'siteplan';
+    var pdfDoc = null;
+    var pageViewport = null;
+    var currentRenderTask = null;
+
+    var currentHousePins = [];
+    var currentTowerPins = [];
+    var activeFilter = 'all';
+    var toastTimer = null;
+
+    var latestDashboardData = null;
+    var unitStatusByCode = {};
+    var chartInstances = {};
+    var dataCache = { installment: {}, work: {}, unitplan: {} };
+
+    var modalState = { sitePlanCode: '', activeTab: 'installment', towerContext: null, drilldownContext: null };
+    var unitPlanViewer = { images: [], selectedIndex: 0, scale: 1, panX: 0, panY: 0, isPanning: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0 };
+
+    // Gemini Voice Assistant state
+    var aiRecorder = null;
+    var aiAudioChunks = [];
+    var aiIsRecording = false;
+    var aiLastMatchedUnits = [];
+    var aiLastTitleKu = '';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initViewSwitcher();
+      initMapZoomAndPan();
+      initHeaderControls();
+      initFilterBar();
+      initModalControls();
+      initKpiCardDrilldowns();
+      initVoiceAssistant();
+
+      showLoadingScreen();
+      loadFullDashboardData();
+      loadSitePlanPdf();
+    });
+
+    /* ---------- Kurdish Sorani Gemini Voice Assistant ---------- */
+    function initVoiceAssistant() {
+      var fab = document.getElementById('aiFabBtn');
+      var panel = document.getElementById('aiPanel');
+      var closeBtn = document.getElementById('aiPanelClose');
+      var micBtn = document.getElementById('aiMicBtn');
+      var textInput = document.getElementById('aiTextInput');
+      var sendBtn = document.getElementById('aiSendBtn');
+
+      fab.addEventListener('click', function() {
+        panel.classList.toggle('is-open');
+        if (panel.classList.contains('is-open')) textInput.focus();
+      });
+
+      closeBtn.addEventListener('click', function() {
+        panel.classList.remove('is-open');
+      });
+
+      document.querySelectorAll('.ai-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          var q = this.getAttribute('data-q');
+          textInput.value = q;
+          sendAiQuery({ text: q });
+        });
+      });
+
+      sendBtn.addEventListener('click', function() {
+        var q = textInput.value.trim();
+        if (!q) return;
+        sendAiQuery({ text: q });
+      });
+
+      textInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          var q = textInput.value.trim();
+          if (q) sendAiQuery({ text: q });
+        }
+      });
+
+      micBtn.addEventListener('click', function() {
+        if (aiIsRecording) {
+          stopAiRecording();
+        } else {
+          startAiRecording();
+        }
+      });
+    }
+
+    function startAiRecording() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast('وێبگەڕەکەت پشتگیری مایک ناکات، تکایە پرسیارەکەت بنووسە.', true);
+        return;
+      }
+
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+          aiAudioChunks = [];
+          var mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+          aiRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+
+          aiRecorder.ondataavailable = function(e) {
+            if (e.data && e.data.size > 0) aiAudioChunks.push(e.data);
+          };
+
+          aiRecorder.onstop = function() {
+            stream.getTracks().forEach(function(t) { t.stop(); });
+            var blob = new Blob(aiAudioChunks, { type: mimeType });
+            var reader = new FileReader();
+            reader.onloadend = function() {
+              var b64 = String(reader.result || '').split(',')[1] || '';
+              if (b64) sendAiQuery({ audioBase64: b64, mimeType: mimeType });
+            };
+            reader.readAsDataURL(blob);
+          };
+
+          aiRecorder.start();
+          aiIsRecording = true;
+          document.getElementById('aiMicBtn').classList.add('is-recording');
+          showAiStatus('گوێم گرتووە... قسە بکە و دواتر کرتە لە مایک بکەرەوە بۆ وەستان.');
+        })
+        .catch(function() {
+          showToast('ڕێگەپێدانی مایک بلۆک کراوە — دەتوانیت پرسیارەکەت بە کوردی بنووسیت.', true);
+        });
+    }
+
+    function stopAiRecording() {
+      if (aiRecorder && aiIsRecording) {
+        aiIsRecording = false;
+        document.getElementById('aiMicBtn').classList.remove('is-recording');
+        aiRecorder.stop();
+      }
+    }
+
+    function showAiStatus(msg) {
+      var box = document.getElementById('aiResponseBox');
+      box.classList.add('is-visible');
+      box.innerHTML = '<div>' + escapeHtml(msg) + '</div>';
+    }
+
+    function sendAiQuery(payload) {
+      showAiStatus('خەریکی شیکردنەوەی پرسیارەکەتە...');
+      google.script.run
+        .withSuccessHandler(function(res) {
+          var box = document.getElementById('aiResponseBox');
+          box.classList.add('is-visible');
+
+          if (!res || !res.ok) {
+            box.innerHTML = '<div style="color:#b91c1c;font-weight:700;">' + escapeHtml(res && res.error ? res.error : 'هەڵەیەک ڕوویدا.') + '</div>';
+            return;
+          }
+
+          var html = '';
+          if (res.transcript) {
+            html += '<div class="ai-transcript">پرسیار: «' + escapeHtml(res.transcript) + '»</div>';
+          }
+          html += '<div>' + escapeHtml(res.answerKu || '') + '</div>';
+
+          if (res.action === 'filter_units' && res.matchedUnits && res.matchedUnits.length) {
+            aiLastMatchedUnits = res.matchedUnits;
+            aiLastTitleKu = res.titleKu || 'ئەنجامی گەڕان';
+            html += '<button id="aiOpenMatchedBtn" class="ai-open-list-btn" type="button">بینینی لیستەکە (' + formatInt(res.matchedUnits.length) + ' یەکە) و داگرتنی Excel</button>';
+          }
+
+          box.innerHTML = html;
+
+          var openBtn = document.getElementById('aiOpenMatchedBtn');
+          if (openBtn) {
+            openBtn.addEventListener('click', function() {
+              renderDrilldownModal(aiLastTitleKu, aiLastMatchedUnits);
+            });
+          }
+
+          if (res.action === 'open_unit' && res.unitCode) {
+            focusAndOpenUnit(res.unitCode);
+          } else if (res.action === 'map_filter' && res.mapFilter) {
+            switchWorkspaceView('siteplan');
+            activeFilter = res.mapFilter;
+            document.querySelectorAll('.filter-chip').forEach(function(c) {
+              c.classList.toggle('is-active', c.getAttribute('data-filter') === activeFilter);
+            });
+            applyPinFilter();
+          }
+        })
+        .withFailureHandler(function(err) {
+          showAiStatus('هەڵە: ' + getErrorMessage(err));
+        })
+        .askGeminiAssistant(payload);
+    }
+
+    /* ---------- Kurdish Localization Helpers ---------- */
+    function localizeZoneKu(name) {
+      var str = String(name || '');
+      if (str.indexOf('Tower ') === 0) return 'تاوەری ' + str.slice(6);
+      if (str.indexOf('Zone ') === 0) return 'زۆنی ' + str.slice(5);
+      if (str === 'Houses') return 'خانووەکان';
+      if (str === 'Apartments') return 'شوقەکان';
+      if (str === 'Other') return 'هیتر';
+      return str;
+    }
+
+    function localizeTierKu(label) { return label === '100% Paid' ? '100% دراوە' : label; }
+    function localizeTypeKu(type) { return type === 'Numeric' ? 'ژمارەیی' : (type === 'Category' ? 'پۆلێن' : 'دەق'); }
+    function localizeStatusKu(status) { return status === 'sold' ? 'فرۆشراو' : (status === 'reserved' ? 'حجزکراو' : (status === 'available' ? 'بەردەست' : (status === 'review' ? 'پێداچوونەوە' : status))); }
+
+    /* ---------- View Switcher, Search, Drill-Down, Charts, Map ---------- */
+    function initViewSwitcher() {
+      document.querySelectorAll('.view-switch-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { switchWorkspaceView(this.getAttribute('data-view')); });
+      });
+    }
+
+    function switchWorkspaceView(viewName) {
+      if (viewName !== 'siteplan' && viewName !== 'dashboard') return;
+      activeView = viewName;
+      document.getElementById('btnViewSitePlan').classList.toggle('is-active', viewName === 'siteplan');
+      document.getElementById('btnViewDashboard').classList.toggle('is-active', viewName === 'dashboard');
+      document.getElementById('viewSitePlan').classList.toggle('is-active', viewName === 'siteplan');
+      document.getElementById('viewDashboard').classList.toggle('is-active', viewName === 'dashboard');
+      if (viewName === 'dashboard' && latestDashboardData) setTimeout(function() { renderFullDashboard(latestDashboardData); }, 30);
+    }
+
+    function initHeaderControls() {
+      document.getElementById('refreshDataBtn').addEventListener('click', function() {
+        dataCache = { installment: {}, work: {}, unitplan: {} };
+        showToast(activeView === 'dashboard' ? 'خەریکی نوێکردنەوەی داتاکانە...' : 'Refreshing live data...', false);
+        loadFullDashboardData();
+        loadPinsFromSheet(true);
+      });
+      initUnitSearch();
+    }
+
+    function initUnitSearch() {
+      var input = document.getElementById('unitSearchInput');
+      var clearBtn = document.getElementById('unitSearchClear');
+      var resultsEl = document.getElementById('unitSearchResults');
+
+      input.addEventListener('input', function() {
+        var q = input.value.trim();
+        clearBtn.style.display = q ? 'flex' : 'none';
+        renderSearchSuggestions(q);
+      });
+
+      input.addEventListener('focus', function() { if (input.value.trim()) renderSearchSuggestions(input.value.trim()); });
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && input.value.trim()) { resultsEl.classList.remove('is-open'); focusAndOpenUnit(normalizeSitePlanCode(input.value.trim())); }
+        else if (e.key === 'Escape') resultsEl.classList.remove('is-open');
+      });
+
+      clearBtn.addEventListener('click', function() { input.value = ''; clearBtn.style.display = 'none'; resultsEl.classList.remove('is-open'); clearHighlightedPin(); input.focus(); });
+      document.addEventListener('click', function(e) { if (!e.target.closest('.search-wrap')) resultsEl.classList.remove('is-open'); });
+    }
+
+    function renderSearchSuggestions(rawQuery) {
+      var resultsEl = document.getElementById('unitSearchResults');
+      var query = rawQuery.toUpperCase().replace(/\s+/g, '');
+      if (!query) { resultsEl.classList.remove('is-open'); return; }
+
+      var matches = [];
+      currentHousePins.forEach(function(pin) {
+        var code = normalizeSitePlanCode(pin.SitePlanCode || pin.sitePlanCode || pin.code || '');
+        var uCode = normalizeSitePlanCode(pin.UnitCode || '');
+        if ((code && code.indexOf(query) !== -1) || (uCode && uCode.indexOf(query) !== -1)) {
+          var primaryCode = uCode || code;
+          matches.push({ code: primaryCode, label: primaryCode, status: pin.Status || 'unknown' });
+        }
+      });
+
+      var normalizedTower = normalizeSitePlanCode(query);
+      if (/^\d+-[A-D]-\d{2}-\d{2}$/.test(normalizedTower)) matches.unshift({ code: normalizedTower, label: normalizedTower, status: 'tower' });
+      matches = matches.slice(0, 12);
+
+      if (!matches.length) {
+        resultsEl.innerHTML = '<button type="button" class="search-item" data-code="' + escapeHtml(normalizeSitePlanCode(rawQuery)) + '"><span class="search-item-code">Lookup "' + escapeHtml(normalizeSitePlanCode(rawQuery)) + '"</span><span class="status-pill tower">Search</span></button>';
+      } else {
+        var html = '';
+        matches.forEach(function(item) {
+          var badgeClass = (item.status === 'available' || item.status === 'sold' || item.status === 'reserved' || item.status === 'review') ? item.status : 'tower';
+          html += '<button type="button" class="search-item" data-code="' + escapeHtml(item.code) + '"><span class="search-item-code">' + escapeHtml(item.label) + '</span><span class="status-pill ' + badgeClass + '">' + escapeHtml(item.status === 'unknown' ? 'Unit' : item.status) + '</span></button>';
+        });
+        resultsEl.innerHTML = html;
+      }
+
+      resultsEl.querySelectorAll('.search-item').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var code = this.getAttribute('data-code');
+          document.getElementById('unitSearchInput').value = code;
+          document.getElementById('unitSearchClear').style.display = 'flex';
+          resultsEl.classList.remove('is-open');
+          focusAndOpenUnit(code);
+        });
+      });
+      resultsEl.classList.add('is-open');
+    }
+
+    function focusAndOpenUnit(sitePlanCode) {
+      clearHighlightedPin();
+      if (activeView === 'siteplan') {
+        var escaped = CSS.escape(sitePlanCode);
+        var pinEl = document.querySelector('.house-pin[data-unit-code="' + escaped + '"]') || document.querySelector('.house-pin[data-code="' + escaped + '"]');
+        if (pinEl && pageViewport) {
+          pinEl.classList.add('is-highlighted');
+          var dashboard = document.getElementById('dashboard');
+          if (PLAN_ZOOM < 1.8) setPlanZoom(1.8);
+          var targetX = ((parseFloat(pinEl.style.left) || 50) / 100) * pageViewport.width * PLAN_ZOOM - dashboard.clientWidth / 2;
+          var targetY = ((parseFloat(pinEl.style.top) || 50) / 100) * pageViewport.height * PLAN_ZOOM - dashboard.clientHeight / 2;
+          dashboard.scrollTo({ left: Math.max(0, targetX), top: Math.max(0, targetY), behavior: 'smooth' });
+        }
+      }
+      openUnitModal(sitePlanCode, null, null);
+    }
+
+    function clearHighlightedPin() { document.querySelectorAll('.house-pin.is-highlighted').forEach(function(el) { el.classList.remove('is-highlighted'); }); }
+
+    function initKpiCardDrilldowns() {
+      document.getElementById('cardKpiSold').addEventListener('click', function() { openFilteredUnitsModal('هەموو یەکە فرۆشراوەکان', function(u) { return u.status === 'sold'; }); });
+      document.getElementById('cardKpiAvailable').addEventListener('click', function() { openFilteredUnitsModal('هەموو یەکە بەردەستەکان', function(u) { return u.status === 'available'; }); });
+      document.getElementById('cardKpiContract').addEventListener('click', function() { openFilteredUnitsModal('یەکە گرێبەستکراوەکان (فرۆشراو)', function(u) { return u.status === 'sold'; }); });
+      document.getElementById('cardKpiCollected').addEventListener('click', function() { openFilteredUnitsModal('یەکەکان بەپێی داهاتی کۆکراوە', function(u) { return u.collected > 0; }); });
+      document.getElementById('cardKpiDebt').addEventListener('click', function() { openFilteredUnitsModal('هەموو یەکەکان بە قەرزی دواکەوتووەوە', function(u) { return u.debt > 0; }); });
+    }
+
+    function openFilteredUnitsModal(title, filterFn) {
+      if (!latestDashboardData || !latestDashboardData.units) return;
+      renderDrilldownModal(title, latestDashboardData.units.filter(filterFn));
+    }
+
+    function csvEscape(val) { var s = String(val === null || val === undefined ? '' : val); return /[",\r\n]/.test(s) ? ('"' + s.replace(/"/g, '""') + '"') : s; }
+
+    function exportUnitsToCsv(title, units) {
+      if (!units || !units.length) { showToast('هیچ داتایەک نییە بۆ داگرتن.', true); return; }
+      var headers = ['ژمارەی یەکە', 'خاوەن یەکە', 'ژمارە تەلەفون', 'زۆن / تاوەر', 'دۆخ', 'کۆی نرخ ($)', 'بڕی داواکراو ($)', 'بڕی دراو ($)', 'قەرزی دواکەوتوو ($)'];
+      var lines = [headers.map(csvEscape).join(',')];
+      units.forEach(function(u) {
+        lines.push([u.code, u.owner || '', u.phone || '', localizeZoneKu(u.zone), localizeStatusKu(u.status), u.total || 0, u.due || 0, u.collected || 0, u.debt || 0].map(csvEscape).join(','));
+      });
+      var blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', String(title || 'Shari_Sharan').replace(/[\\/:*?"<>|]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('فایلی Excel (CSV) بە سەرکەوتوویی داگیرا.', false);
+    }
+
+    function renderDrilldownModal(title, units) {
+      setUnitPlanModalMode(false);
+      modalState.towerContext = null;
+      modalState.drilldownContext = { title: title, units: units };
+      document.getElementById('modalTabs').classList.remove('is-visible');
+      document.getElementById('modalBackBtn').style.display = 'none';
+
+      var modalTitle = document.getElementById('modalTitle');
+      clearElementSheetStyle(modalTitle);
+      modalTitle.textContent = title + ' (' + formatInt(units.length) + ')';
+
+      var modalBody = document.getElementById('modalBody');
+      if (!units.length) {
+        modalBody.innerHTML = '<p class="empty-message" style="font-family:var(--font-ku);">هیچ یەکەیەک لەم بەشەدا نەدۆزرایەوە.</p>';
+        document.getElementById('modalBackdrop').style.display = 'flex';
+        return;
+      }
+
+      var html = '<div class="drilldown-wrap"><div class="drilldown-bar"><span id="drilldownCountBadge" class="drilldown-count">کۆی یەکەکان: ' + formatInt(units.length) + '</span><div class="drilldown-actions"><input id="drilldownSearchInput" class="drilldown-filter-input" type="text" placeholder="گەڕان بەپێی ژمارەی یەکە، ناو، یان تەلەفون..."><button id="exportDrilldownCsvBtn" class="export-csv-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span>داگرتنی Excel (CSV)</span></button></div></div><div class="table-scroll"><table class="analytics-table"><thead><tr><th>ژمارەی یەکە</th><th>خاوەن یەکە</th><th>ژمارە تەلەفون</th><th>زۆن / تاوەر</th><th>دۆخ</th><th>کۆی نرخ</th><th>بڕی دراو</th><th>قەرزی دواکەوتوو</th></tr></thead><tbody id="drilldownTableBody"></tbody></table></div></div>';
+      modalBody.innerHTML = html;
+
+      var currentFilteredUnits = units.slice();
+      function populateRows(query) {
+        var q = String(query || '').toLowerCase().trim();
+        var tbody = document.getElementById('drilldownTableBody');
+        var rowsHtml = '';
+        currentFilteredUnits = [];
+        units.forEach(function(u) {
+          if (q && (u.code + ' ' + u.owner + ' ' + (u.phone || '') + ' ' + u.zone + ' ' + u.category).toLowerCase().indexOf(q) === -1) return;
+          currentFilteredUnits.push(u);
+          var badgeClass = u.status === 'sold' ? 'sold' : (u.status === 'reserved' ? 'reserved' : (u.status === 'available' ? 'available' : 'review'));
+          rowsHtml += '<tr class="is-clickable" data-unit-code="' + escapeHtml(u.code) + '"><td class="num-cell" style="font-weight:800;color:#2563eb;">' + escapeHtml(u.code) + '</td><td>' + escapeHtml(u.owner || '—') + '</td><td class="num-cell" style="color:#475569;">' + escapeHtml(u.phone || '—') + '</td><td>' + escapeHtml(localizeZoneKu(u.zone)) + '</td><td><span class="status-pill ' + badgeClass + '">' + escapeHtml(localizeStatusKu(u.status)) + '</span></td><td class="num-cell">' + formatCurrency(u.total) + '</td><td class="num-cell" style="color:#047857;">' + formatCurrency(u.collected) + '</td><td class="num-cell" style="color:' + (u.debt > 0 ? '#b91c1c' : '#64748b') + ';">' + formatCurrency(u.debt) + '</td></tr>';
+        });
+        tbody.innerHTML = rowsHtml || '<tr><td colspan="8" style="text-align:center;color:#64748b;">هیچ ئەنجامێک نەدۆزرایەوە.</td></tr>';
+        document.getElementById('drilldownCountBadge').textContent = 'کۆی یەکەکان: ' + formatInt(currentFilteredUnits.length);
+        tbody.querySelectorAll('tr[data-unit-code]').forEach(function(row) {
+          row.addEventListener('click', function() { openUnitModal(this.getAttribute('data-unit-code'), null, modalState.drilldownContext); });
+        });
+      }
+
+      populateRows('');
+      document.getElementById('drilldownSearchInput').addEventListener('input', function() { populateRows(this.value); });
+      document.getElementById('exportDrilldownCsvBtn').addEventListener('click', function() { exportUnitsToCsv(title, currentFilteredUnits); });
+      document.getElementById('modalBackdrop').style.display = 'flex';
+    }
+
+    function loadFullDashboardData() {
+      google.script.run
+        .withSuccessHandler(function(data) {
+          latestDashboardData = data;
+          indexUnitStatuses(data && data.units ? data.units : []);
+          renderFullDashboard(data);
+        })
+        .withFailureHandler(function(error) { showToast('هەڵە لە بارکردنی داتای داشبۆرد: ' + getErrorMessage(error), true); })
+        .getFullDashboardData();
+    }
+
+    function indexUnitStatuses(units) {
+      unitStatusByCode = {};
+      units.forEach(function(u) { if (u && u.code) unitStatusByCode[normalizeSitePlanCode(u.code)] = u.status || 'unknown'; });
+    }
+
+    function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
+
+    function renderFullDashboard(data) {
+      if (!data || !data.summary) return;
+      var s = data.summary;
+
+      document.getElementById('kpiSoldValue').textContent = formatInt(s.soldUnits) + ' / ' + formatInt(s.totalUnits);
+      document.getElementById('kpiSoldRate').textContent = (s.soldRate || 0) + '%';
+      document.getElementById('kpiSoldBar').style.width = Math.min(100, s.soldRate || 0) + '%';
+      document.getElementById('kpiBreakdown').textContent = 'خانوو: ' + formatInt(s.houseSold) + '/' + formatInt(s.houseUnits) + ' • شوقە: ' + formatInt(s.apartmentSold) + '/' + formatInt(s.apartmentUnits);
+
+      var availPct = s.totalUnits > 0 ? Math.round((s.availableUnits / s.totalUnits) * 1000) / 10 : 0;
+      document.getElementById('kpiAvailableValue').textContent = formatInt(s.availableUnits);
+      document.getElementById('kpiAvailableBar').style.width = Math.min(100, availPct) + '%';
+      document.getElementById('kpiAvailableSub').textContent = 'خانوو: ' + formatInt(s.houseAvailable) + ' • شوقە: ' + formatInt(s.apartmentAvailable);
+
+      var reservedTag = document.getElementById('kpiReservedTag');
+      if (s.reservedUnits > 0) { reservedTag.style.display = 'inline-block'; reservedTag.textContent = formatInt(s.reservedUnits) + ' حجزکراو'; }
+      else { reservedTag.style.display = 'none'; }
+
+      var contractBase = s.soldContractValue > 0 ? s.soldContractValue : s.totalContractValue;
+      document.getElementById('kpiSoldContractValue').textContent = formatCurrency(contractBase);
+      document.getElementById('kpiTotalInventorySub').textContent = 'ماوەی گرێبەست: ' + formatCurrency(s.remainingContractBalance);
+
+      document.getElementById('kpiCollectedValue').textContent = formatCurrency(s.collectedAmount);
+      document.getElementById('kpiCollectionRate').textContent = (s.collectionRate || 0) + '%';
+      document.getElementById('kpiCollectionBar').style.width = Math.min(100, s.collectionRate || 0) + '%';
+      document.getElementById('kpiDueSub').textContent = s.dueToDateAmount > 0 ? ('لە بڕی داواکراو: ' + (s.dueCollectionRate || 0) + '%') : 'بڕی وەرگیراو بەرامبەر گرێبەستەکان';
+
+      document.getElementById('kpiOutstandingValue').textContent = formatCurrency(s.outstandingAmount);
+      document.getElementById('kpiDebtPctTag').textContent = (s.overdueRate || 0) + '%';
+      document.getElementById('kpiOverdueSub').textContent = s.dueToDateAmount > 0 ? ('لە کۆی بڕی داواکراو: ' + formatCurrency(s.dueToDateAmount)) : 'کۆی قەرزی دواکەوتوو لای کڕیاران';
+
+      document.getElementById('dashUpdatedBadge').textContent = 'ڕاستەوخۆ • ' + formatInt(s.totalUnits) + ' یەکە • نوێکرایەوە ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      renderReservedTable(data.reservedBreakdown || [], s);
+      renderNumericColumnsTable(data.numericColumns || []);
+      renderTopDebtTable(data.topDebtUnits || []);
+      renderCategoricalBreakdowns(data.categoricalColumns || []);
+      renderAllColumnsHealth(data.allColumnsHealth || []);
+
+      if (activeView !== 'dashboard') return;
+      renderDonutCharts(s);
+      renderReservedComboChart(data.reservedBreakdown || []);
+      renderZonesComboChart(data.zones || []);
+      renderCollectionLineChart(data.collectionTiers || []);
+    }
+
+    function renderReservedTable(items, summary) {
+      var tbody = document.getElementById('reservedTableBody');
+      var headerSub = document.getElementById('reservedHeaderSummary');
+      if (headerSub) headerSub.textContent = 'کۆی گشتی: ' + formatInt(summary.reservedUnits || 0) + ' یەکە • ' + formatCurrency(summary.reservedTotalValue || 0);
+      if (!items.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;">هیچ یەکەیەکی حجزکراو نەدۆزرایەوە.</td></tr>'; return; }
+
+      var html = '';
+      items.forEach(function(item) {
+        html += '<tr class="is-clickable" data-reserved-type="' + escapeHtml(item.type) + '"><td style="font-weight:700;color:#6d28d9;">' + escapeHtml(item.type) + '</td><td class="num-cell">' + formatInt(item.count) + '</td><td class="num-cell" style="color:#64748b;">' + item.pct + '%</td><td class="num-cell">' + formatCurrency(item.totalValue) + '</td></tr>';
+      });
+      html += '<tr class="is-clickable" data-reserved-type="__ALL__" style="background:#f8fafc;font-weight:800;"><td style="font-weight:800;">کۆی گشتی حجزکراوەکان</td><td class="num-cell" style="font-weight:800;">' + formatInt(summary.reservedUnits || 0) + '</td><td class="num-cell" style="font-weight:800;">100%</td><td class="num-cell" style="font-weight:800;color:#6d28d9;">' + formatCurrency(summary.reservedTotalValue || 0) + '</td></tr>';
+      tbody.innerHTML = html;
+
+      tbody.querySelectorAll('tr[data-reserved-type]').forEach(function(row) {
+        row.addEventListener('click', function() {
+          var rType = this.getAttribute('data-reserved-type');
+          if (rType === '__ALL__') openFilteredUnitsModal('هەموو یەکە حجزکراوەکان', function(u) { return u.status === 'reserved'; });
+          else openFilteredUnitsModal(rType, function(u) { return u.reservedType === rType; });
+        });
+      });
+    }
+
+    function renderReservedComboChart(items) {
+      destroyChart('reservedCombo');
+      chartInstances.reservedCombo = new Chart(document.getElementById('chartReservedCombo'), {
+        type: 'bar',
+        data: {
+          labels: items.map(function(i) { return i.type; }),
+          datasets: [
+            { label: 'ژمارەی یەکەکان', data: items.map(function(i) { return i.count; }), backgroundColor: ['#8b5cf6', '#a855f7', '#6366f1', '#ec4899', '#0ea5e9'], borderRadius: 6, yAxisID: 'y' },
+            { type: 'line', label: 'کۆی نرخ ($)', data: items.map(function(i) { return i.totalValue; }), borderColor: '#0f172a', backgroundColor: '#0f172a', borderWidth: 2.5, pointBackgroundColor: '#cf5c2a', pointBorderColor: '#ffffff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3, yAxisID: 'y1' }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', rtl: true, labels: { boxWidth: 11, font: { size: 12, weight: '600' }, color: '#334155' } },
+            tooltip: { rtl: true, callbacks: { label: function(ctx) { return ctx.datasetIndex === 1 ? (ctx.dataset.label + ': ' + formatCurrency(ctx.parsed.y)) : (ctx.dataset.label + ': ' + formatInt(ctx.parsed.y)); } } }
+          },
+          onClick: function(evt, elements) {
+            if (!elements.length) return;
+            var item = items[elements[0].index];
+            if (item) openFilteredUnitsModal(item.type, function(u) { return u.reservedType === item.type; });
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'ژمارەی یەکەکان', font: { size: 12, weight: '700' } }, grid: { color: '#f1f5f9' } },
+            y1: { position: 'right', beginAtZero: true, title: { display: true, text: 'کۆی نرخ ($)', font: { size: 12, weight: '700' } }, grid: { drawOnChartArea: false }, ticks: { callback: function(v) { return '$' + Number(v).toLocaleString('en-US'); } } }
+          }
+        }
+      });
+    }
+
+    function renderDonutCharts(s) {
+      document.getElementById('centerSalesPct').textContent = (s.soldRate || 0) + '%';
+      document.getElementById('centerCollectionPct').textContent = (s.collectionRate || 0) + '%';
+      document.getElementById('centerTotalUnits').textContent = formatInt(s.totalUnits);
+      var basePlugins = { legend: { position: 'bottom', rtl: true, labels: { boxWidth: 10, padding: 12, font: { size: 12, weight: '600' }, color: '#334155' } }, tooltip: { rtl: true } };
+
+      destroyChart('salesDonut');
+      chartInstances.salesDonut = new Chart(document.getElementById('chartSalesDonut'), {
+        type: 'doughnut',
+        data: { labels: ['فرۆشراو', 'حجزکراو', 'بەردەست', 'پێداچوونەوە'], datasets: [{ data: [s.soldUnits, s.reservedUnits, s.availableUnits, s.reviewUnits], backgroundColor: ['#cf5c2a', '#8b5cf6', '#10b981', '#f59e0b'], borderWidth: 2, borderColor: '#ffffff' }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: basePlugins,
+          onClick: function(evt, elements) {
+            if (!elements.length) return;
+            var idx = elements[0].index;
+            if (idx === 0) openFilteredUnitsModal('یەکە فرۆشراوەکان', function(u) { return u.status === 'sold'; });
+            else if (idx === 1) openFilteredUnitsModal('هەموو یەکە حجزکراوەکان', function(u) { return u.status === 'reserved'; });
+            else if (idx === 2) openFilteredUnitsModal('یەکە بەردەستەکان', function(u) { return u.status === 'available'; });
+            else if (idx === 3) openFilteredUnitsModal('یەکەکانی پێداچوونەوە', function(u) { return u.status === 'review'; });
+          }
+        }
+      });
+
+      destroyChart('collectionDonut');
+      chartInstances.collectionDonut = new Chart(document.getElementById('chartCollectionDonut'), {
+        type: 'doughnut',
+        data: { labels: ['بڕی دراو', 'ماوەی گرێبەست'], datasets: [{ data: [s.collectedAmount, s.remainingContractBalance], backgroundColor: ['#10b981', '#e2e8f0'], borderWidth: 2, borderColor: '#ffffff' }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: basePlugins,
+          onClick: function(evt, elements) {
+            if (!elements.length) return;
+            var idx = elements[0].index;
+            if (idx === 0) openFilteredUnitsModal('یەکەکان بەپێی بڕی دراو', function(u) { return u.collected > 0; });
+            else if (idx === 1) openFilteredUnitsModal('یەکەکان بە ماوەی گرێبەستەوە', function(u) { return u.status === 'sold' && u.total > u.collected; });
+          }
+        }
+      });
+
+      destroyChart('unitMixDonut');
+      chartInstances.unitMixDonut = new Chart(document.getElementById('chartUnitMixDonut'), {
+        type: 'doughnut',
+        data: { labels: ['خانووی فرۆشراو', 'خانووی حجزکراو', 'خانووی بەردەست', 'شوقەی فرۆشراو', 'شوقەی حجزکراو', 'شوقەی بەردەست'], datasets: [{ data: [s.houseSold, s.houseReserved, s.houseAvailable, s.apartmentSold, s.apartmentReserved, s.apartmentAvailable], backgroundColor: ['#0f172a', '#7c3aed', '#94a3b8', '#2563eb', '#c084fc', '#93c5fd'], borderWidth: 2, borderColor: '#ffffff' }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: basePlugins,
+          onClick: function(evt, elements) {
+            if (!elements.length) return;
+            var idx = elements[0].index;
+            if (idx === 0) openFilteredUnitsModal('خانووە فرۆشراوەکان', function(u) { return u.unitType === 'house' && u.status === 'sold'; });
+            else if (idx === 1) openFilteredUnitsModal('خانووە حجزکراوەکان', function(u) { return u.unitType === 'house' && u.status === 'reserved'; });
+            else if (idx === 2) openFilteredUnitsModal('خانووە بەردەستەکان', function(u) { return u.unitType === 'house' && u.status === 'available'; });
+            else if (idx === 3) openFilteredUnitsModal('شوقە فرۆشراوەکان', function(u) { return u.unitType === 'apartment' && u.status === 'sold'; });
+            else if (idx === 4) openFilteredUnitsModal('شوقە حجزکراوەکان', function(u) { return u.unitType === 'apartment' && u.status === 'reserved'; });
+            else if (idx === 5) openFilteredUnitsModal('شوقە بەردەستەکان', function(u) { return u.unitType === 'apartment' && u.status === 'available'; });
+          }
+        }
+      });
+    }
+
+    function renderZonesComboChart(zones) {
+      destroyChart('zonesCombo');
+      var reservedData = zones.map(function(z) { return z.reserved || 0; });
+      var reviewData = zones.map(function(z) { return z.review || 0; });
+      var hasReserved = reservedData.some(function(v) { return v > 0; });
+      var hasReview = reviewData.some(function(v) { return v > 0; });
+
+      var datasets = [{ label: 'یەکەی فرۆشراو', data: zones.map(function(z) { return z.sold; }), backgroundColor: '#cf5c2a', borderRadius: 5, stack: 'units', yAxisID: 'y', _statusKey: 'sold' }];
+      if (hasReserved) datasets.push({ label: 'یەکەی حجزکراو', data: reservedData, backgroundColor: '#8b5cf6', borderRadius: 5, stack: 'units', yAxisID: 'y', _statusKey: 'reserved' });
+      datasets.push({ label: 'یەکەی بەردەست', data: zones.map(function(z) { return z.available; }), backgroundColor: '#10b981', borderRadius: 5, stack: 'units', yAxisID: 'y', _statusKey: 'available' });
+      if (hasReview) datasets.push({ label: 'پێداچوونەوە', data: reviewData, backgroundColor: '#f59e0b', borderRadius: 5, stack: 'units', yAxisID: 'y', _statusKey: 'review' });
+      datasets.push({ type: 'line', label: 'ڕێژەی کۆکردنەوە %', data: zones.map(function(z) { return z.collectionPct; }), borderColor: '#2563eb', backgroundColor: '#2563eb', borderWidth: 2.5, pointRadius: 4, tension: 0.35, yAxisID: 'y1', _statusKey: 'all' });
+
+      chartInstances.zonesCombo = new Chart(document.getElementById('chartZonesCombo'), {
+        type: 'bar',
+        data: { labels: zones.map(function(z) { return localizeZoneKu(z.name); }), datasets: datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false, interaction: { mode: 'nearest', intersect: true },
+          plugins: { legend: { position: 'bottom', rtl: true, labels: { boxWidth: 11, font: { size: 12, weight: '600' }, color: '#334155' } }, tooltip: { rtl: true } },
+          onClick: function(evt, elements) {
+            if (!elements.length) return;
+            var el = elements[0], zoneObj = zones[el.index], ds = datasets[el.datasetIndex];
+            if (!zoneObj || !ds) return;
+            var zName = zoneObj.name, zLabel = localizeZoneKu(zName);
+            if (ds._statusKey === 'all') openFilteredUnitsModal(zLabel + ' — هەموو یەکەکان', function(u) { return u.zone === zName; });
+            else openFilteredUnitsModal(zLabel + ' — ' + localizeStatusKu(ds._statusKey), function(u) { return u.zone === zName && u.status === ds._statusKey; });
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false } },
+            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'ژمارەی یەکەکان', font: { size: 12, weight: '700' } }, grid: { color: '#f1f5f9' } },
+            y1: { position: 'right', beginAtZero: true, max: 100, title: { display: true, text: 'ڕێژەی کۆکردنەوە %', font: { size: 12, weight: '700' } }, grid: { drawOnChartArea: false } }
+          }
+        }
+      });
+    }
+
+    function renderCollectionLineChart(tiers) {
+      destroyChart('collectionLine');
+      chartInstances.collectionLine = new Chart(document.getElementById('chartCollectionLine'), {
+        type: 'line',
+        data: {
+          labels: tiers.map(function(t) { return localizeTierKu(t.label); }),
+          datasets: [{ label: 'یەکە فرۆشراوەکان', data: tiers.map(function(t) { return t.count; }), borderColor: '#0f172a', backgroundColor: 'rgba(15, 23, 42, 0.08)', fill: true, borderWidth: 2.5, pointBackgroundColor: '#cf5c2a', pointBorderColor: '#ffffff', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7, tension: 0.35 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { rtl: true } },
+          onClick: function(evt, elements) {
+            if (!elements.length) return;
+            var tierObj = tiers[elements[0].index];
+            if (tierObj) openFilteredUnitsModal('ڕێژەی پارەدان: ' + localizeTierKu(tierObj.label), function(u) { return u.status === 'sold' && u.tier === tierObj.label; });
+          },
+          scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+        }
+      });
+    }
+
+    function renderNumericColumnsTable(cols) {
+      var tbody = document.getElementById('numericColumnsBody');
+      if (!cols.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;">هیچ ستوونێکی ژمارەیی نەدۆزرایەوە.</td></tr>'; return; }
+      var html = '';
+      cols.forEach(function(col) {
+        html += '<tr><td style="font-weight:700;">' + escapeHtml(col.name) + '</td><td class="num-cell">' + formatNumberSmart(col.sum) + '</td><td class="num-cell">' + formatNumberSmart(col.avg) + '</td><td class="num-cell" style="color:#64748b;">' + formatNumberSmart(col.min) + ' / ' + formatNumberSmart(col.max) + '</td><td class="num-cell">' + col.fillPct + '%</td></tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function renderTopDebtTable(units) {
+      var tbody = document.getElementById('topDebtBody');
+      if (!units.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;">هیچ بڕە قەرزێک نەدۆزرایەوە.</td></tr>'; return; }
+      var html = '';
+      units.forEach(function(u) {
+        html += '<tr class="is-clickable" data-unit-code="' + escapeHtml(u.code) + '"><td class="num-cell" style="font-weight:800;color:#2563eb;">' + escapeHtml(u.code) + '</td><td>' + escapeHtml(u.owner) + '</td><td class="num-cell">' + formatCurrency(u.total) + '</td><td class="num-cell">' + u.paidPct + '%</td><td class="num-cell" style="color:#b91c1c;">' + formatCurrency(u.debt) + '</td></tr>';
+      });
+      tbody.innerHTML = html;
+      tbody.querySelectorAll('tr[data-unit-code]').forEach(function(row) {
+        row.addEventListener('click', function() { openUnitModal(this.getAttribute('data-unit-code'), null, null); });
+      });
+    }
+
+    function renderCategoricalBreakdowns(catCols) {
+      var section = document.getElementById('categoricalSection');
+      var grid = document.getElementById('categoricalGrid');
+      if (!catCols.length) { section.style.display = 'none'; return; }
+
+      section.style.display = 'block';
+      var palette = ['#cf5c2a', '#0f172a', '#2563eb', '#10b981', '#f59e0b', '#6366f1', '#64748b'];
+      var html = '';
+      catCols.forEach(function(col) {
+        html += '<div class="panel"><div class="panel-header"><h4 class="panel-title">' + escapeHtml(col.name) + '</h4><span class="panel-sub">' + formatInt(col.totalFilled) + ' پڕکراوە</span></div><div class="cat-list">';
+        col.items.slice(0, 7).forEach(function(item, idx) {
+          html += '<div class="cat-row" data-cat-col="' + escapeHtml(col.name) + '" data-cat-val="' + escapeHtml(item.label) + '"><div class="cat-row-top"><span class="cat-row-name">' + escapeHtml(item.label) + '</span><span class="cat-row-meta">' + formatInt(item.count) + ' (' + item.pct + '%)</span></div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:' + Math.min(100, item.pct) + '%;background:' + palette[idx % palette.length] + ';"></div></div></div>';
+        });
+        html += '</div></div>';
+      });
+      grid.innerHTML = html;
+
+      grid.querySelectorAll('.cat-row[data-cat-col]').forEach(function(rowEl) {
+        rowEl.addEventListener('click', function() {
+          var colName = this.getAttribute('data-cat-col'), valLabel = this.getAttribute('data-cat-val');
+          openFilteredUnitsModal(colName + ': ' + valLabel, function(u) { return u.cats && u.cats[colName] === valLabel; });
+        });
+      });
+    }
+
+    function renderAllColumnsHealth(cols) {
+      var tbody = document.getElementById('allColumnsHealthBody');
+      if (!cols.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#64748b;">هیچ ستوونێک نەدۆزرایەوە.</td></tr>'; return; }
+      var html = '';
+      cols.forEach(function(c) {
+        var barColor = c.fillPct >= 90 ? '#10b981' : (c.fillPct >= 50 ? '#2563eb' : '#f59e0b');
+        html += '<tr><td style="font-weight:700;">' + escapeHtml(c.name) + '</td><td><span class="type-badge ' + escapeHtml(c.type) + '">' + escapeHtml(localizeTypeKu(c.type)) + '</span></td><td class="num-cell">' + formatInt(c.filled) + '</td><td class="num-cell" style="color:#64748b;">' + formatInt(c.empty) + '</td><td class="num-cell" style="color:' + (c.errors > 0 ? '#b91c1c' : '#64748b') + ';">' + formatInt(c.errors) + '</td><td><div class="mini-bar-wrap"><div class="mini-bar"><div class="mini-bar-fill" style="width:' + Math.min(100, c.fillPct) + '%;background:' + barColor + ';"></div></div><span class="num-cell" style="min-width:44px;text-align:left;">' + c.fillPct + '%</span></div></td></tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    /* ---------- PDF & Map Rendering ---------- */
+    function loadSitePlanPdf() {
+      google.script.run
+        .withSuccessHandler(function(fileData) {
+          pdfjsLib.getDocument({ data: base64ToUint8Array(fileData.base64) }).promise
+            .then(function(pdf) { pdfDoc = pdf; return renderPdfPage(PDF_PAGE_NUMBER); })
+            .then(function() { detectTowerPins(); loadPinsFromSheet(false); })
+            .catch(function(error) { hideLoadingScreen(); showToast('Could not render site plan PDF: ' + getErrorMessage(error), true); });
+        })
+        .withFailureHandler(function(error) { hideLoadingScreen(); showToast('Could not load site plan PDF: ' + getErrorMessage(error), true); })
+        .getSitePlanPdfBase64();
+    }
+
+    function renderPdfPage(pageNumber) {
+      return pdfDoc.getPage(pageNumber).then(function(page) {
+        var unscaledViewport = page.getViewport({ scale: 1 });
+        var dashboard = document.getElementById('dashboard');
+        var scale = Math.min(Math.max(320, dashboard.clientWidth || window.innerWidth), 1800) / unscaledViewport.width;
+        pageViewport = page.getViewport({ scale: scale });
+
+        var canvas = document.getElementById('pdfCanvas');
+        var context = canvas.getContext('2d');
+        var outputScale = getInitialOutputScale();
+
+        canvas.width = Math.floor(pageViewport.width * outputScale);
+        canvas.height = Math.floor(pageViewport.height * outputScale);
+        canvas.style.width = pageViewport.width + 'px';
+        canvas.style.height = pageViewport.height + 'px';
+
+        document.getElementById('sitePlanShell').style.width = pageViewport.width + 'px';
+        document.getElementById('sitePlanShell').style.height = pageViewport.height + 'px';
+        document.getElementById('pinLayer').style.width = pageViewport.width + 'px';
+        document.getElementById('pinLayer').style.height = pageViewport.height + 'px';
+
+        if (currentRenderTask) { try { currentRenderTask.cancel(); } catch (e) {} }
+        currentRenderTask = page.render({ canvasContext: context, viewport: pageViewport, transform: [outputScale, 0, 0, outputScale, 0, 0] });
+        return currentRenderTask.promise.then(function() { currentRenderTask = null; applyZoom(); });
+      });
+    }
+
+    function getInitialOutputScale() {
+      if (!pageViewport) return window.devicePixelRatio || 1;
+      var targetScale = (window.devicePixelRatio || 1) * PDF_RENDER_QUALITY;
+      var maxScaleByPixels = Math.sqrt(MAX_CANVAS_PIXELS / Math.max(1, pageViewport.width * pageViewport.height));
+      return Math.max(1, Math.min(targetScale, maxScaleByPixels));
+    }
+
+    function initMapZoomAndPan() {
+      var dashboard = document.getElementById('dashboard');
+      dashboard.addEventListener('wheel', function(e) { if (!pageViewport) return; e.preventDefault(); setPlanZoom(PLAN_ZOOM * (e.deltaY < 0 ? 1.12 : 1 / 1.12), e.clientX, e.clientY); }, { passive: false });
+      document.getElementById('zoomInBtn').addEventListener('click', function() { setPlanZoom(PLAN_ZOOM * 1.25); });
+      document.getElementById('zoomOutBtn').addEventListener('click', function() { setPlanZoom(PLAN_ZOOM / 1.25); });
+      document.getElementById('zoomResetBtn').addEventListener('click', function() { setPlanZoom(1); dashboard.scrollTo({ left: 0, top: 0, behavior: 'smooth' }); });
+
+      var isPanning = false, startClientX = 0, startClientY = 0, startScrollLeft = 0, startScrollTop = 0;
+      dashboard.addEventListener('pointerdown', function(e) {
+        if (!pageViewport || (e.button !== undefined && e.button !== 0)) return;
+        if (e.target && e.target.closest && e.target.closest('.pin')) return;
+        isPanning = true; startClientX = e.clientX; startClientY = e.clientY; startScrollLeft = dashboard.scrollLeft; startScrollTop = dashboard.scrollTop;
+        dashboard.classList.add('is-panning'); dashboard.setPointerCapture(e.pointerId); e.preventDefault();
+      });
+      dashboard.addEventListener('pointermove', function(e) {
+        if (!isPanning) return;
+        dashboard.scrollLeft = startScrollLeft - (e.clientX - startClientX);
+        dashboard.scrollTop = startScrollTop - (e.clientY - startClientY);
+        e.preventDefault();
+      });
+      function stopMapDragPan(e) {
+        if (!isPanning) return;
+        isPanning = false; dashboard.classList.remove('is-panning');
+        if (e && e.pointerId !== undefined) { try { dashboard.releasePointerCapture(e.pointerId); } catch (err) {} }
+      }
+      dashboard.addEventListener('pointerup', stopMapDragPan);
+      dashboard.addEventListener('pointercancel', stopMapDragPan);
+      dashboard.addEventListener('pointerleave', stopMapDragPan);
+    }
+
+    function setPlanZoom(newZoom, anchorClientX, anchorClientY) {
+      var dashboard = document.getElementById('dashboard'), oldZoom = PLAN_ZOOM;
+      newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+      if (!pageViewport || Math.abs(newZoom - oldZoom) < 0.001) return;
+      var rect = dashboard.getBoundingClientRect();
+      if (anchorClientX === undefined || anchorClientY === undefined) { anchorClientX = rect.left + dashboard.clientWidth / 2; anchorClientY = rect.top + dashboard.clientHeight / 2; }
+      var mouseX = anchorClientX - rect.left, mouseY = anchorClientY - rect.top;
+      var worldX = (dashboard.scrollLeft + mouseX) / oldZoom, worldY = (dashboard.scrollTop + mouseY) / oldZoom;
+      PLAN_ZOOM = newZoom; applyZoom();
+      dashboard.scrollLeft = (worldX * PLAN_ZOOM) - mouseX; dashboard.scrollTop = (worldY * PLAN_ZOOM) - mouseY;
+    }
+
+    function applyZoom() {
+      if (!pageViewport) return;
+      document.getElementById('zoomContent').style.width = (pageViewport.width * PLAN_ZOOM) + 'px';
+      document.getElementById('zoomContent').style.height = (pageViewport.height * PLAN_ZOOM) + 'px';
+      document.getElementById('sitePlanShell').style.transform = 'scale(' + PLAN_ZOOM + ')';
+      document.getElementById('zoomReadout').textContent = Math.round(PLAN_ZOOM * 100) + '%';
+    }
+
+    function initFilterBar() {
+      document.querySelectorAll('.filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          activeFilter = this.getAttribute('data-filter') || 'all';
+          document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.toggle('is-active', c === chip); });
+          applyPinFilter();
+        });
+      });
+    }
+
+    function applyPinFilter() {
+      document.querySelectorAll('#pinLayer .pin').forEach(function(pin) {
+        var isTower = pin.classList.contains('tower-pin'), status = pin.getAttribute('data-status') || 'unknown', show = true;
+        if (activeFilter === 'towers') show = isTower;
+        else if (activeFilter === 'available' || activeFilter === 'sold' || activeFilter === 'reserved' || activeFilter === 'review') show = !isTower && status === activeFilter;
+        pin.classList.toggle('is-filtered-out', !show);
+      });
+    }
+
+    function detectTowerPins() {
+      currentTowerPins = TOWER_APARTMENT_PIN_CONFIG.map(function(pin) {
+        return { TowerLetter: pin.TowerLetter, ApartmentNumber: String(pin.ApartmentNumber), X_Coord: pin.X_Coord, Y_Coord: pin.Y_Coord, PDF_Page: PDF_PAGE_NUMBER };
+      });
+    }
+
+    function loadPinsFromSheet(isRefresh) {
+      google.script.run
+        .withSuccessHandler(function(pins) {
+          var pagePins = (pins || []).filter(function(pin) { return Number(pin.PDF_Page || 1) === PDF_PAGE_NUMBER; });
+          currentHousePins = pagePins; renderAllPins(); hideLoadingScreen();
+          if (pagePins.length === 0) showToast('No saved house pins were found in the sheet.', true);
+          else if (isRefresh) showToast(activeView === 'dashboard' ? 'داتاکان بە سەرکەوتوویی نوێکرانەوە.' : 'Live data updated (' + pagePins.length + ' house pins).', false);
+        })
+        .withFailureHandler(function(error) { hideLoadingScreen(); showToast('Could not load pins: ' + getErrorMessage(error), true); })
+        .getAllPins();
+    }
+
+    function renderAllPins() {
+      var pinLayer = document.getElementById('pinLayer');
+      pinLayer.innerHTML = '';
+      var seen = {};
+      currentHousePins.forEach(function(pin) {
+        var code = normalizeSitePlanCode(pin.SitePlanCode || pin.sitePlanCode || pin.code || '');
+        if (!code || seen[code]) return;
+        seen[code] = true;
+        renderHousePin(pinLayer, pin, code);
+      });
+      currentTowerPins.forEach(function(pin) { renderTowerPin(pinLayer, pin); });
+      applyPinFilter();
+    }
+
+    function renderHousePin(pinLayer, pin, normalizedCode) {
+      var x = Number(pin.X_Coord), y = Number(pin.Y_Coord);
+      if (!normalizedCode || !isFinite(x) || !isFinite(y)) return;
+      var status = pin.Status || 'unknown', unitCode = normalizeSitePlanCode(pin.UnitCode || '');
+      var displayCode = unitCode || normalizedCode;
+      var pinEl = document.createElement('button');
+      pinEl.type = 'button';
+      pinEl.className = 'pin house-pin status-' + status;
+      pinEl.setAttribute('data-code', normalizedCode);
+      if (unitCode) pinEl.setAttribute('data-unit-code', unitCode);
+      pinEl.setAttribute('data-status', status);
+      pinEl.title = displayCode + (status === 'unknown' ? '' : ' (' + status + ')');
+      pinEl.style.left = (x + PIN_NUDGE_X_PERCENT) + '%';
+      pinEl.style.top = (y + PIN_NUDGE_Y_PERCENT) + '%';
+      pinEl.style.setProperty('--pin-width', (Number(pin.Pin_Width_Percent) || DEFAULT_HOUSE_PIN_WIDTH_PERCENT) + '%');
+      pinEl.style.setProperty('--pin-height', (Number(pin.Pin_Height_Percent) || DEFAULT_HOUSE_PIN_HEIGHT_PERCENT) + '%');
+      pinEl.addEventListener('click', function(e) { e.stopPropagation(); openUnitModal(displayCode, null, null); });
+      pinLayer.appendChild(pinEl);
+    }
+
+    function renderTowerPin(pinLayer, pin) {
+      var x = Number(pin.X_Coord), y = Number(pin.Y_Coord);
+      if (!pin.TowerLetter || !pin.ApartmentNumber || !isFinite(x) || !isFinite(y)) return;
+      var pinEl = document.createElement('button');
+      pinEl.type = 'button';
+      pinEl.className = 'pin tower-pin';
+      pinEl.title = 'Tower ' + pin.TowerLetter + ', Apartment ' + pin.ApartmentNumber;
+      pinEl.style.left = (x + PIN_NUDGE_X_PERCENT) + '%';
+      pinEl.style.top = (y + PIN_NUDGE_Y_PERCENT) + '%';
+      pinEl.style.setProperty('--tower-pin-size', TOWER_PIN_SIZE_PX + 'px');
+      pinEl.addEventListener('click', function(e) { e.stopPropagation(); openTowerFloorSelector(pin.TowerLetter, pin.ApartmentNumber); });
+      pinLayer.appendChild(pinEl);
+    }
+
+    /* ---------- Modals & Tower Floor Heatmap ---------- */
+    function initModalControls() {
+      document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+      document.getElementById('modalBackdrop').addEventListener('click', function(e) { if (e.target.id === 'modalBackdrop') closeModal(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.getElementById('modalBackdrop').style.display === 'flex') closeModal(); });
+      document.getElementById('modalBackBtn').addEventListener('click', function() {
+        if (modalState.drilldownContext) renderDrilldownModal(modalState.drilldownContext.title, modalState.drilldownContext.units);
+        else if (modalState.towerContext) openTowerFloorSelector(modalState.towerContext.towerLetter, modalState.towerContext.apartmentNumber);
+      });
+      document.querySelectorAll('.modal-tab').forEach(function(b) { b.addEventListener('click', function() { switchModalTab(this.getAttribute('data-tab')); }); });
+    }
+
+    function openUnitModal(sitePlanCode, towerContext, drilldownContext) {
+      modalState.sitePlanCode = sitePlanCode; modalState.towerContext = towerContext || null; modalState.drilldownContext = drilldownContext || null;
+      var backBtn = document.getElementById('modalBackBtn');
+      if (modalState.drilldownContext) { backBtn.textContent = '← گەڕانەوە بۆ لیست'; backBtn.style.display = 'inline-flex'; }
+      else if (modalState.towerContext) { backBtn.textContent = '← Floors'; backBtn.style.display = 'inline-flex'; }
+      else backBtn.style.display = 'none';
+      document.getElementById('modalTabs').classList.add('is-visible');
+      document.getElementById('modalBackdrop').style.display = 'flex';
+      switchModalTab('installment');
+    }
+
+    function switchModalTab(tabName) {
+      modalState.activeTab = tabName;
+      document.querySelectorAll('.modal-tab').forEach(function(b) { b.classList.toggle('is-active', b.getAttribute('data-tab') === tabName); });
+      if (tabName === 'installment') loadTabInstallment(modalState.sitePlanCode);
+      else if (tabName === 'work') loadTabWork(modalState.sitePlanCode);
+      else if (tabName === 'unitplan') loadTabUnitPlan(modalState.sitePlanCode);
+    }
+
+    function loadTabInstallment(code) {
+      setUnitPlanModalMode(false); var t = document.getElementById('modalTitle'); clearElementSheetStyle(t); t.textContent = code;
+      if (dataCache.installment[code]) { renderPlotData(dataCache.installment[code]); return; }
+      document.getElementById('modalBody').innerHTML = '<p class="empty-message">Loading installment data for ' + escapeHtml(code) + '...</p>';
+      google.script.run.withSuccessHandler(function(d) { dataCache.installment[code] = d; if (modalState.sitePlanCode === code && modalState.activeTab === 'installment') renderPlotData(d); })
+        .withFailureHandler(function(e) { if (modalState.sitePlanCode === code && modalState.activeTab === 'installment') document.getElementById('modalBody').innerHTML = '<p class="empty-message">Error: ' + escapeHtml(getErrorMessage(e)) + '</p>'; }).getPlotData(code);
+    }
+
+    function loadTabWork(code) {
+      setUnitPlanModalMode(false); var t = document.getElementById('modalTitle'); clearElementSheetStyle(t); t.textContent = code + ' — Work Progress';
+      if (dataCache.work[code]) { renderPlotData(dataCache.work[code]); return; }
+      document.getElementById('modalBody').innerHTML = '<p class="empty-message">Loading work progress for ' + escapeHtml(code) + '...</p>';
+      google.script.run.withSuccessHandler(function(d) { dataCache.work[code] = d; if (modalState.sitePlanCode === code && modalState.activeTab === 'work') renderPlotData(d); })
+        .withFailureHandler(function(e) { if (modalState.sitePlanCode === code && modalState.activeTab === 'work') document.getElementById('modalBody').innerHTML = '<p class="empty-message">Error: ' + escapeHtml(getErrorMessage(e)) + '</p>'; }).getWorkData(code);
+    }
+
+    function loadTabUnitPlan(code) {
+      setUnitPlanModalMode(true); var t = document.getElementById('modalTitle'); clearElementSheetStyle(t); t.textContent = 'Unit Plan — ' + code;
+      if (dataCache.unitplan[code]) { renderUnitPlanData(dataCache.unitplan[code]); return; }
+      document.getElementById('modalBody').innerHTML = '<p class="empty-message">Loading unit plan images for ' + escapeHtml(code) + '...</p>';
+      google.script.run.withSuccessHandler(function(d) { dataCache.unitplan[code] = d; if (modalState.sitePlanCode === code && modalState.activeTab === 'unitplan') renderUnitPlanData(d); })
+        .withFailureHandler(function(e) { if (modalState.sitePlanCode === code && modalState.activeTab === 'unitplan') document.getElementById('modalBody').innerHTML = '<p class="empty-message">Error: ' + escapeHtml(getErrorMessage(e)) + '</p>'; }).getUnitPlanData(code);
+    }
+
+    function openTowerFloorSelector(towerLetter, apartmentNumber) {
+      setUnitPlanModalMode(false); modalState.drilldownContext = null;
+      document.getElementById('modalTabs').classList.remove('is-visible'); document.getElementById('modalBackBtn').style.display = 'none';
+      towerLetter = String(towerLetter || '').toUpperCase(); apartmentNumber = pad2(apartmentNumber);
+      var t = document.getElementById('modalTitle'); clearElementSheetStyle(t); t.textContent = 'Tower ' + towerLetter + ' — Apartment ' + Number(apartmentNumber);
+      var modalBody = document.getElementById('modalBody'); modalBody.innerHTML = '';
+
+      var headerRow = document.createElement('div'); headerRow.className = 'floor-header-row';
+      headerRow.innerHTML = '<p class="floor-help">Select a floor (1 to 12) to view details.</p><div class="floor-legend"><span class="floor-legend-item"><span class="dot available"></span>Available</span><span class="floor-legend-item"><span class="dot sold"></span>Sold</span><span class="floor-legend-item"><span class="dot reserved"></span>Reserved</span><span class="floor-legend-item"><span class="dot review"></span>Review</span></div>';
+      modalBody.appendChild(headerRow);
+
+      var grid = document.createElement('div'); grid.className = 'floor-grid';
+      for (var floor = 1; floor <= 12; floor++) {
+        var lookupCode = buildTowerApartmentLookupCode(towerLetter, floor, apartmentNumber);
+        var fs = unitStatusByCode[lookupCode] || '';
+        var st = fs === 'available' ? 'Available' : (fs === 'sold' ? 'Sold' : (fs === 'reserved' ? 'Reserved' : (fs === 'review' ? 'Review' : '')));
+        var btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'floor-button' + (fs ? (' status-' + fs) : ''); btn.setAttribute('data-floor', floor);
+        btn.innerHTML = '<span>Floor ' + floor + '</span>' + (st ? '<span class="floor-status-sub">' + st + '</span>' : '');
+        btn.addEventListener('click', function() { openUnitModal(buildTowerApartmentLookupCode(towerLetter, Number(this.getAttribute('data-floor')), apartmentNumber), { towerLetter: towerLetter, apartmentNumber: apartmentNumber }, null); });
+        grid.appendChild(btn);
+      }
+      modalBody.appendChild(grid);
+      var p = document.createElement('p'); p.className = 'code-preview'; p.textContent = 'Code format example: Floor 2 opens ' + buildTowerApartmentLookupCode(towerLetter, 2, apartmentNumber);
+      modalBody.appendChild(p);
+      document.getElementById('modalBackdrop').style.display = 'flex';
+    }
+
+    function renderPlotData(data) {
+      var modalBody = document.getElementById('modalBody'), modalTitle = document.getElementById('modalTitle');
+      setUnitPlanModalMode(false); clearElementSheetStyle(modalTitle);
+      if (!data || data.notFound) { modalBody.innerHTML = '<p class="empty-message">' + escapeHtml(data && data.message ? data.message : 'No matching data was found.') + '</p>'; return; }
+      applyElementSheetStyle(modalTitle, data.titleStyle);
+      var fields = data.fields || [];
+      if (!fields.length) { modalBody.innerHTML = '<p class="empty-message">This row has no displayable fields.</p>'; return; }
+      var html = '<table class="data-table"><tbody>';
+      fields.forEach(function(f) {
+        var val = f.displayValue !== undefined && f.displayValue !== null ? f.displayValue : (f.formattedValue !== undefined && f.formattedValue !== null ? f.formattedValue : f.value);
+        html += '<tr><td style="' + escapeHtml(sheetStyleToCss(f.valueStyle)) + '">' + escapeHtml(val) + '</td><th style="' + escapeHtml(sheetStyleToCss(f.labelStyle)) + '">' + escapeHtml(f.label) + '</th></tr>';
+      });
+      modalBody.innerHTML = html + '</tbody></table>';
+    }
+
+    function renderUnitPlanData(data) {
+      var modalBody = document.getElementById('modalBody'), modalTitle = document.getElementById('modalTitle');
+      clearElementSheetStyle(modalTitle);
+      if (!data || data.notFound || !(data.images || []).length) { setUnitPlanModalMode(false); modalBody.innerHTML = '<p class="empty-message">' + escapeHtml(data && data.message ? data.message : 'No unit plan images were found.') + '</p>'; return; }
+      setUnitPlanModalMode(true); modalTitle.textContent = data.title || ('Unit Plan ' + data.sitePlanCode);
+      unitPlanViewer.images = data.images; unitPlanViewer.selectedIndex = 0; unitPlanViewer.scale = 1; unitPlanViewer.panX = 0; unitPlanViewer.panY = 0;
+      var html = '<div class="unit-plan-toolbar"><a id="unitOpenImageLink" href="#" target="_blank" rel="noopener">Open Full Image</a><span class="unit-plan-zoom-note">Scroll to zoom • Drag to pan • Double-click to reset</span></div><div id="unitPlanViewport" class="unit-plan-viewport"><img id="unitPlanMainImage" class="unit-plan-main-image" alt="Unit plan image" draggable="false"></div><div class="unit-plan-thumbs" id="unitPlanThumbs">';
+      data.images.forEach(function(img, idx) { html += '<button type="button" class="unit-thumb" data-index="' + idx + '"><img src="' + escapeHtml(img.thumbUrl) + '" alt="Thumbnail ' + (idx + 1) + '"></button>'; });
+      modalBody.innerHTML = html + '</div>';
+      setupUnitPlanViewerEvents(); selectUnitPlanImage(0);
+    }
+
+    function setupUnitPlanViewerEvents() {
+      var vp = document.getElementById('unitPlanViewport');
+      document.querySelectorAll('.unit-thumb').forEach(function(b) { b.addEventListener('click', function() { selectUnitPlanImage(Number(this.getAttribute('data-index'))); }); });
+      if (!vp) return;
+      vp.addEventListener('wheel', function(e) { e.preventDefault(); zoomUnitPlanBy(e.deltaY < 0 ? 1.12 : 1 / 1.12); }, { passive: false });
+      vp.addEventListener('pointerdown', function(e) {
+        if (unitPlanViewer.scale <= 1) return;
+        unitPlanViewer.isPanning = true; unitPlanViewer.startX = e.clientX; unitPlanViewer.startY = e.clientY; unitPlanViewer.startPanX = unitPlanViewer.panX; unitPlanViewer.startPanY = unitPlanViewer.panY;
+        vp.classList.add('is-panning'); vp.setPointerCapture(e.pointerId); e.preventDefault();
+      });
+      vp.addEventListener('pointermove', function(e) {
+        if (!unitPlanViewer.isPanning) return;
+        unitPlanViewer.panX = unitPlanViewer.startPanX + (e.clientX - unitPlanViewer.startX);
+        unitPlanViewer.panY = unitPlanViewer.startPanY + (e.clientY - unitPlanViewer.startY);
+        applyUnitPlanTransform(); e.preventDefault();
+      });
+      vp.addEventListener('pointerup', stopUnitPlanPan); vp.addEventListener('pointercancel', stopUnitPlanPan); vp.addEventListener('pointerleave', stopUnitPlanPan); vp.addEventListener('dblclick', resetUnitPlanZoom);
+    }
+
+    function stopUnitPlanPan(e) { var vp = document.getElementById('unitPlanViewport'); if (!unitPlanViewer.isPanning) return; unitPlanViewer.isPanning = false; if (vp) { vp.classList.remove('is-panning'); if (e && e.pointerId !== undefined) { try { vp.releasePointerCapture(e.pointerId); } catch (err) {} } } }
+    function selectUnitPlanImage(idx) { if (!unitPlanViewer.images[idx]) return; unitPlanViewer.selectedIndex = idx; var img = unitPlanViewer.images[idx]; document.getElementById('unitPlanMainImage').src = img.imageUrl; document.getElementById('unitOpenImageLink').href = img.viewUrl || img.imageUrl; document.querySelectorAll('.unit-thumb').forEach(function(b) { b.classList.toggle('is-active', Number(b.getAttribute('data-index')) === idx); }); resetUnitPlanZoom(); }
+    function zoomUnitPlanBy(f) { unitPlanViewer.scale = Math.max(1, Math.min(6, unitPlanViewer.scale * f)); if (unitPlanViewer.scale <= 1) { unitPlanViewer.panX = 0; unitPlanViewer.panY = 0; } applyUnitPlanTransform(); }
+    function resetUnitPlanZoom() { unitPlanViewer.scale = 1; unitPlanViewer.panX = 0; unitPlanViewer.panY = 0; applyUnitPlanTransform(); }
+    function applyUnitPlanTransform() { var m = document.getElementById('unitPlanMainImage'), vp = document.getElementById('unitPlanViewport'); if (m) m.style.transform = 'translate(' + unitPlanViewer.panX + 'px, ' + unitPlanViewer.panY + 'px) scale(' + unitPlanViewer.scale + ')'; if (vp) vp.classList.toggle('is-zoomed', unitPlanViewer.scale > 1); }
+    function setUnitPlanModalMode(isUnitPlan) { var m = document.getElementById('mainModal'); if (m) m.classList.toggle('unit-plan-modal', !!isUnitPlan); }
+    function closeModal() { document.getElementById('modalBackdrop').style.display = 'none'; setUnitPlanModalMode(false); modalState.drilldownContext = null; unitPlanViewer.images = []; unitPlanViewer.isPanning = false; }
+
+    function normalizeSitePlanCode(value) {
+      var text = String(value || '').toUpperCase().trim().replace(/[\u2010-\u2015]/g, '-').replace(/\s+/g, '');
+      var m1 = text.match(/^(\d+)-([A-D])-(\d{1,2})-(\d{1,2})$/i);
+      if (m1) return m1[1] + '-' + m1[2].toUpperCase() + '-' + pad2(m1[3]) + '-' + pad2(m1[4]);
+      var m2 = text.match(/^([A-D])-(\d{1,2})-(\d{1,2})$/i);
+      if (m2) return TOWER_SHEET_CODE_PREFIX + '-' + m2[1].toUpperCase() + '-' + pad2(m2[2]) + '-' + pad2(m2[3]);
+      var m3 = text.match(/^A(\d{1,2})-?(\d{1,3})$/i);
+      if (m3) return 'A' + m3[1] + '-' + pad2(m3[2]);
+      return text;
+    }
+
+    function buildTowerApartmentLookupCode(t, f, a) { return [TOWER_SHEET_CODE_PREFIX, String(t || '').toUpperCase().trim(), pad2(f), pad2(a)].join('-'); }
+    function sheetStyleToCss(s) { if (!s) return ''; var c = []; addCssRule(c, 'font-family', s.fontFamily, true); addCssRule(c, 'font-size', s.fontSize, false); addCssRule(c, 'color', s.color, false); addCssRule(c, 'font-weight', s.fontWeight, false); addCssRule(c, 'font-style', s.fontStyle, false); addCssRule(c, 'text-decoration', s.textDecoration, false); addCssRule(c, 'background-color', s.backgroundColor, false); addCssRule(c, 'text-align', s.textAlign, false); addCssRule(c, 'vertical-align', s.verticalAlign, false); return c.join('; '); }
+    function addCssRule(c, p, v, q) { if (v === null || v === undefined || v === '') return; v = String(v).trim().replace(/[;<>{}]/g, ''); if (!v) return; if (q) v = "'" + v.replace(/'/g, "\\'") + "'"; c.push(p + ': ' + v); }
+    function applyElementSheetStyle(el, s) { if (!el || !s) return; clearElementSheetStyle(el); if (s.fontFamily) el.style.fontFamily = s.fontFamily; if (s.fontSize) el.style.fontSize = s.fontSize; if (s.color) el.style.color = s.color; if (s.fontWeight) el.style.fontWeight = s.fontWeight; if (s.fontStyle) el.style.fontStyle = s.fontStyle; if (s.textDecoration) el.style.textDecoration = s.textDecoration; if (s.backgroundColor) el.style.backgroundColor = s.backgroundColor; if (s.textAlign) el.style.textAlign = s.textAlign; }
+    function clearElementSheetStyle(el) { if (!el) return; el.style.fontFamily = ''; el.style.fontSize = ''; el.style.color = ''; el.style.fontWeight = ''; el.style.fontStyle = ''; el.style.textDecoration = ''; el.style.backgroundColor = ''; el.style.textAlign = ''; }
+    function base64ToUint8Array(b64) { var raw = window.atob(b64), arr = new Uint8Array(raw.length); for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i); return arr; }
+    function pad2(v) { var n = Number(v); return !isFinite(n) ? String(v) : (n < 10 ? '0' + n : String(n)); }
+    function formatInt(v) { var n = Number(v || 0); return isFinite(n) ? n.toLocaleString('en-US') : '0'; }
+    function formatCurrency(v) { var n = Number(v || 0); return isFinite(n) ? ('$' + Math.round(n).toLocaleString('en-US')) : '$0'; }
+    function formatNumberSmart(v) { var n = Number(v || 0); return !isFinite(n) ? '0' : (Math.abs(n) >= 100 ? Math.round(n).toLocaleString('en-US') : (Math.round(n * 100) / 100).toLocaleString('en-US')); }
+    function showLoadingScreen() { var el = document.getElementById('loadingScreen'); if (el) { el.classList.remove('is-hidden'); el.setAttribute('aria-busy', 'true'); } }
+    function hideLoadingScreen() { var el = document.getElementById('loadingScreen'); if (el) { el.classList.add('is-hidden'); el.setAttribute('aria-busy', 'false'); } }
+    function showToast(msg, isError) { var t = document.getElementById('toastBanner'); if (!t) return; t.textContent = msg; t.classList.toggle('is-error', !!isError); t.classList.add('is-visible'); if (toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(function() { t.classList.remove('is-visible'); }, isError ? 6000 : 3200); }
+    function escapeHtml(v) { return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+    function getErrorMessage(err) { return !err ? 'Unknown error' : (typeof err === 'string' ? err : (err.message || JSON.stringify(err))); }
+  </script>
+</body>
+</html>
